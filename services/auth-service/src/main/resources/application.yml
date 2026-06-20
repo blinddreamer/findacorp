@@ -1,0 +1,47 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  profiles:
+    # Loads application-local.yml in dev; override with SPRING_PROFILES_ACTIVE in prod.
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MariaDBDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+eve:
+  sso:
+    client-id: ${EVE_CLIENT_ID}
+    client-secret: ${EVE_CLIENT_SECRET}
+    authorize-url: https://login.eveonline.com/v2/oauth/authorize
+    token-url: https://login.eveonline.com/v2/oauth/token
+    verify-url: https://login.eveonline.com/oauth/verify
+    scopes: "publicData esi-skills.read_skills.v1 esi-corporations.read_corporation_membership.v1 esi-corporations.track_members.v1"
+    callback-url: http://localhost:3000/callback
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiry-minutes: 60
+  refresh-expiry-days: 30
+
+token:
+  encryption:
+    key: ${TOKEN_ENCRYPTION_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

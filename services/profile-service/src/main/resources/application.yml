@@ -1,0 +1,50 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: profile-service
+  profiles:
+    # Loads application-local.yml in dev; override with SPRING_PROFILES_ACTIVE in prod.
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+
+app:
+  # When true, only a corp's CEO or appointed HR may edit its listing / trigger syncs
+  # (once the corp's CEO is known). Mirror the frontend CORP_EDIT_RESTRICTED flag.
+  corp-edit-restricted: ${CORP_EDIT_RESTRICTED}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

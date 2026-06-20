@@ -1,0 +1,64 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: data-collector
+  profiles:
+    # Loads application-local.yml in dev; override with SPRING_PROFILES_ACTIVE in prod.
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: false
+
+esi:
+  base-url: https://esi.evetech.net/latest
+
+zkill:
+  base-url: https://zkillboard.com/api
+
+auth-service:
+  url: ${AUTH_SERVICE_URL}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+sync:
+  pilot:
+    interval-ms: ${PILOT_REFRESH_INTERVAL:21600000}   # 6 hours
+  corp:
+    interval-ms: ${CORP_REFRESH_INTERVAL:43200000}   # 12 hours
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      esi:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 60s
+        sliding-window-size: 10
+      zkillboard:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 120s
+        sliding-window-size: 5
+  ratelimiter:
+    instances:
+      zkillboard:
+        limit-for-period: 1
+        limit-refresh-period: 1s
+        timeout-duration: 5s
