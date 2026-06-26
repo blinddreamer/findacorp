@@ -2,12 +2,11 @@ package com.drydock.collector.service;
 
 import com.drydock.collector.dto.esi.EsiCorpAllianceEntry;
 import com.drydock.collector.dto.esi.EsiCorpInfo;
-import com.drydock.collector.dto.esi.EsiMemberTracking;
-import com.drydock.collector.dto.esi.EsiNameResult;
+import com.drydock.collector.dto.evewho.EveWhoCorpList;
 import com.drydock.collector.dto.zkill.ZKillCharacterStats;
 import com.drydock.collector.dto.zkill.ZKillEntry;
-import com.drydock.collector.feign.AuthServiceClient;
 import com.drydock.collector.feign.EsiClient;
+import com.drydock.collector.feign.EveWhoClient;
 import com.drydock.collector.feign.ZKillboardClient;
 import com.drydock.common.dto.AllianceHistoryDto;
 import com.drydock.common.events.CorpEnrichedEvent;
@@ -30,7 +29,7 @@ public class CorpEnrichmentService {
 
     private final EsiClient esiClient;
     private final ZKillboardClient zkillClient;
-    private final AuthServiceClient authClient;
+    private final EveWhoClient eveWhoClient;
     private final EsiNameCacheService nameCache;
 
     public CorpEnrichedEvent enrich(Long corpId) {
@@ -65,11 +64,10 @@ public class CorpEnrichmentService {
 
         List<AllianceHistoryDto> allianceHistory = fetchAllianceHistory(corpId);
 
-        // Member data requires the CEO's (Director-role) token. Resolve it once and
-        // reuse it for both the roster and the join-date (member-tracking) lookups.
-        String ceoBearer = resolveCeoBearer(corp.getCeoId(), corpId);
-        Map<Long, String> memberNames = ceoBearer != null ? fetchMemberNames(corpId, ceoBearer) : null;
-        Map<Long, String> memberSince = ceoBearer != null ? fetchMemberSince(corpId, ceoBearer) : null;
+        // Roster comes from EVE Who's public API — no EVE SSO scope or CEO token needed.
+        // EVE Who carries no join dates, so member-change history is derived downstream by
+        // diffing successive roster snapshots (see profile-service CorpService).
+        Map<Long, String> memberNames = fetchMembersFromEveWho(corpId);
 
         String ceoName = corp.getCeoId() != null ? nameCache.getCharacterName(corp.getCeoId()) : null;
 
@@ -87,70 +85,34 @@ public class CorpEnrichmentService {
             corp.getCeoId(),
             ceoName,
             allianceHistory,
-            memberNames,
-            memberSince
+            memberNames
         );
     }
 
-    // ── Member roster ─────────────────────────────────────────────────────────
+    // ── Member roster (EVE Who) ───────────────────────────────────────────────
 
-    private String resolveCeoBearer(Long ceoId, Long corpId) {
-        if (ceoId == null) return null;
+    /**
+     * characterId → name for the corp's current roster, from EVE Who's public API.
+     * Returns {@code null} on failure or when EVE Who has no roster for the corp, so the
+     * consumer skips the diff rather than wiping the stored roster on a transient blip.
+     */
+    private Map<Long, String> fetchMembersFromEveWho(Long corpId) {
+        EveWhoCorpList list;
         try {
-            return "Bearer " + authClient.getEveAccessToken(ceoId);
+            list = eveWhoClient.getCorpList(corpId);
+            Thread.sleep(1000); // be a good citizen — EVE Who expects low-rate access
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
         } catch (Exception e) {
-            log.debug("CEO {} token unavailable for corp {} member fetch: {}", ceoId, corpId, e.getMessage());
+            log.warn("EVE Who roster fetch failed for corp {}: {}", corpId, e.getMessage());
             return null;
         }
-    }
-
-    /** characterId → corp join date (ESI start_date). Empty if the scope/role is missing. */
-    private Map<Long, String> fetchMemberSince(Long corpId, String bearer) {
-        List<EsiMemberTracking> tracking;
-        try {
-            tracking = esiClient.getCorpMemberTracking(corpId, bearer);
-        } catch (Exception e) {
-            // Most likely the CEO hasn't re-authed with esi-corporations.track_members.v1 yet.
-            log.debug("Member tracking unavailable for corp {}: {}", corpId, e.getMessage());
-            return Map.of();
-        }
-        if (tracking == null) return Map.of();
-        Map<Long, String> since = new HashMap<>();
-        for (EsiMemberTracking t : tracking) {
-            if (t.getCharacterId() != null && t.getStartDate() != null) {
-                since.put(t.getCharacterId(), t.getStartDate());
-            }
-        }
-        return since;
-    }
-
-    private Map<Long, String> fetchMemberNames(Long corpId, String bearer) {
-        List<Long> memberIds;
-        try {
-            memberIds = esiClient.getCorpMembers(corpId, bearer);
-        } catch (Exception e) {
-            log.warn("Could not fetch corp members for {}: {}", corpId, e.getMessage());
+        if (list == null || list.getCharacters() == null || list.getCharacters().isEmpty()) {
+            log.debug("EVE Who returned no roster for corp {}", corpId);
             return null;
         }
-        if (memberIds == null || memberIds.isEmpty()) return Map.of();
-
-        Map<Long, String> names = new HashMap<>();
-        for (int i = 0; i < memberIds.size(); i += 1000) {
-            List<Long> batch = memberIds.subList(i, Math.min(i + 1000, memberIds.size()));
-            try {
-                List<EsiNameResult> results = esiClient.getUniverseNames(batch);
-                if (results != null) {
-                    for (EsiNameResult r : results) {
-                        if (r.getId() != null && r.getName() != null) {
-                            names.put(r.getId(), r.getName());
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("Name resolution batch failed for corp {}: {}", corpId, e.getMessage());
-            }
-        }
-        return names;
+        return list.toMemberNames();
     }
 
     // ── zKillboard stats ──────────────────────────────────────────────────────

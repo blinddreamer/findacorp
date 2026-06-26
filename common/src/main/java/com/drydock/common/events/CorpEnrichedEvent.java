@@ -20,7 +20,6 @@ public record CorpEnrichedEvent(
         Long ceoId,
         String ceoName,
         List<AllianceHistoryDto> allianceHistory,
-        Map<Long, String> memberNames,
-        // characterId → ESI corp join date (start_date, ISO-8601); from member-tracking
-        Map<Long, String> memberSince
+        // characterId → name for the corp's current roster (sourced from EVE Who)
+        Map<Long, String> memberNames
 ) {}

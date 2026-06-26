@@ -26,8 +26,8 @@ export default function CorpHistory({ c }: { c: CorpProfile }) {
         </div>
         {memberEvents.length === 0 ? (
           <div className="muted" style={{ textAlign: 'center', padding: 24, fontSize: 13, lineHeight: 1.7 }}>
-            No member history yet.<br />
-            Join dates and departures populate once the corp CEO logs in and a sync runs.
+            No member changes recorded yet.<br />
+            Joins and departures are tracked from the first sync onward.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 520, overflowY: 'auto' }}>

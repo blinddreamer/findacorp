@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -182,20 +181,23 @@ public class CorpService {
             memberSnapshotRepository.save(snap);
         }
 
-        // Roster diff — only when member data was available
-        if (event.memberNames() != null) {
+        // Roster diff — only when member data was available. EVE Who returns null/empty on
+        // a transient blip or an unindexed corp; treat that as "no data" and skip, rather
+        // than diffing against an empty roster and wrongly marking the whole corp as LEFT.
+        if (event.memberNames() == null || event.memberNames().isEmpty()) {
+            log.debug("Corp {}: no roster from EVE Who this sync — skipping member diff", event.corpId());
+        } else {
             Map<Long, String> incoming = event.memberNames();
-            Map<Long, String> memberSince = event.memberSince() != null ? event.memberSince() : Map.of();
 
             List<CorpMember> previousRoster = memberRepository.findByCorpIdOrderByCharacterNameAsc(event.corpId());
             Set<Long> previousIds = previousRoster.stream()
                 .map(CorpMember::getCharacterId).collect(Collectors.toSet());
 
             List<CorpMemberEvent> events = new ArrayList<>();
-            // Joiners: members not already in the roster. Dated by their real ESI corp
-            // join date (start_date) when available, else the sync time. On the first
-            // sync this seeds the full membership as a genuine historical timeline, so
-            // unlike sync-time deltas it is safe (and useful) to record the baseline.
+            // Joiners: members not already in the roster. EVE Who carries no join dates, so
+            // we record the sync time at which the member was first observed. On the first
+            // sync this seeds the full membership as a baseline timeline, which is both safe
+            // and useful (unlike sync-time deltas, it can't produce spurious churn).
             for (Map.Entry<Long, String> entry : incoming.entrySet()) {
                 if (!previousIds.contains(entry.getKey())) {
                     CorpMemberEvent e = new CorpMemberEvent();
@@ -203,12 +205,12 @@ public class CorpService {
                     e.setCharacterId(entry.getKey());
                     e.setCharacterName(entry.getValue());
                     e.setEventType("JOINED");
-                    e.setOccurredAt(parseJoinDate(memberSince.get(entry.getKey()), syncedAt));
+                    e.setOccurredAt(syncedAt);
                     events.add(e);
                 }
             }
-            // Leavers: in previous but not in incoming. ESI gives no leave date, so we
-            // record the sync time at which the departure was detected.
+            // Leavers: in previous but not in incoming. We record the sync time at which the
+            // departure was detected (no source gives a true leave date).
             Set<Long> incomingIds = incoming.keySet();
             for (CorpMember prev : previousRoster) {
                 if (!incomingIds.contains(prev.getCharacterId())) {
@@ -254,16 +256,6 @@ public class CorpService {
         } catch (Exception e) {
             log.warn("Could not deliver CEO-change notification for corp {}: {}",
                 corp.getCorpId(), e.getMessage());
-        }
-    }
-
-    /** Parse an ESI start_date (ISO-8601 instant) to UTC, falling back when absent/malformed. */
-    private LocalDateTime parseJoinDate(String startDate, LocalDateTime fallback) {
-        if (startDate == null || startDate.isBlank()) return fallback;
-        try {
-            return LocalDateTime.ofInstant(Instant.parse(startDate), ZoneOffset.UTC);
-        } catch (Exception e) {
-            return fallback;
         }
     }
 }

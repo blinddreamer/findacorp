@@ -28,7 +28,7 @@ eve:
     authorize-url: https://login.eveonline.com/v2/oauth/authorize
     token-url: https://login.eveonline.com/v2/oauth/token
     verify-url: https://login.eveonline.com/oauth/verify
-    scopes: "publicData esi-skills.read_skills.v1 esi-corporations.read_corporation_membership.v1 esi-corporations.track_members.v1"
+    scopes: "publicData esi-skills.read_skills.v1"
     callback-url: http://localhost:3000/callback
 
 jwt:

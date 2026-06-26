@@ -53,13 +53,13 @@ export default function CorpMembers({ c }: { c: CorpProfile }) {
         <div className="section-head">
           <h3>Roster{roster.length > 0 ? ` · ${roster.length}` : ''}</h3>
           {roster.length === 0 && (
-            <span className="muted" style={{ fontSize: 12 }}>requires corp CEO to log in</span>
+            <span className="muted" style={{ fontSize: 12 }}>awaiting sync</span>
           )}
         </div>
         {roster.length === 0 ? (
           <div className="muted" style={{ textAlign: 'center', padding: '32px 0', fontSize: 13, lineHeight: 1.7 }}>
-            Roster data is populated when the corp CEO logs into DRYDOCK.<br />
-            Once synced, the full member list appears here.
+            Roster is sourced from EVE Who and appears after the next sync.<br />
+            Some corps have limited public data, so the list may be partial.
           </div>
         ) : (
           <>

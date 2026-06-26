@@ -31,6 +31,9 @@ esi:
 zkill:
   base-url: https://zkillboard.com/api
 
+evewho:
+  base-url: https://evewho.com/api
+
 auth-service:
   url: ${AUTH_SERVICE_URL}
 

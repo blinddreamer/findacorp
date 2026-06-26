@@ -4,8 +4,6 @@ import com.drydock.collector.dto.esi.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
@@ -27,17 +25,6 @@ public interface EsiClient {
 
     @GetMapping("/corporations/{corpId}/alliancehistory/")
     List<EsiCorpAllianceEntry> getCorpAllianceHistory(@PathVariable("corpId") Long corpId);
-
-    @GetMapping("/corporations/{corpId}/members/")
-    List<Long> getCorpMembers(@PathVariable("corpId") Long corpId,
-                              @RequestHeader("Authorization") String bearer);
-
-    @GetMapping("/corporations/{corpId}/membertracking/")
-    List<EsiMemberTracking> getCorpMemberTracking(@PathVariable("corpId") Long corpId,
-                                                  @RequestHeader("Authorization") String bearer);
-
-    @PostMapping("/universe/names/")
-    List<EsiNameResult> getUniverseNames(@RequestBody List<Long> ids);
 
     @GetMapping("/characters/{characterId}/")
     EsiCharacterInfo getCharacterInfo(@PathVariable("characterId") Long characterId);
