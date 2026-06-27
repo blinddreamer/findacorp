@@ -36,10 +36,10 @@ export default function LandingScreen() {
       </section>
 
       <div className="ticker">
-        <div className="cell"><div className="k">Pilots indexed</div><div className="v">19,842</div></div>
-        <div className="cell"><div className="k">Corps recruiting</div><div className="v accent">1,927</div></div>
-        <div className="cell"><div className="k">Matches this week</div><div className="v">312</div></div>
-        <div className="cell"><div className="k">Most-wanted role</div><div className="v" style={{ fontSize: 18 }}>Logi anchor (EUTZ)</div></div>
+        <div className="cell"><div className="k">Pilots indexed</div><div className="v">N/A</div></div>
+        <div className="cell"><div className="k">Corps recruiting</div><div className="v accent">N/A</div></div>
+        <div className="cell"><div className="k">Matches this week</div><div className="v">N/A</div></div>
+        <div className="cell"><div className="k">Most-wanted role</div><div className="v" style={{ fontSize: 18 }}>Logi</div></div>
         <div className="cell"><div className="k">Tranquility status</div><div className="v" style={{ fontSize: 14, color: 'var(--good)' }}>● Online</div></div>
       </div>
 
