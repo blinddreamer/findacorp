@@ -19,7 +19,7 @@ interface Filters {
 }
 
 const TZ_OPTS = ['EU', 'US', 'AU'];
-const CONTENT_OPTS = ['Sov', 'Small gang', 'Black ops', 'Wormhole', 'Fleet', 'Lowsec'];
+const CONTENT_OPTS = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
 const ROLE_OPTS = ['Logi', 'DPS', 'Capital'];
 const ACTIVITY_OPTS = ['Daily', 'Weekly', 'Casual'];
 
@@ -28,7 +28,7 @@ export default function SearchPilotsScreen() {
   const [showListingModal, setShowListingModal] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     tz: { EU: true, US: false, AU: false },
-    content: { 'Sov': false, 'Small gang': true, 'Black ops': true, 'Wormhole': false, 'Fleet': false, 'Lowsec': false },
+    content: { 'Null': false, 'Small gang': true, 'Black ops': true, 'Wormhole': false, 'Lowsec': false, 'Industry': false, 'Capital': false, 'Mining': false, 'Exploration': false, 'FW': false, 'FW Plexing': false, 'FW Small Gang': false },
     minSP: 25,
     activity: { Daily: true, Weekly: false, Casual: false },
     role: { 'Logi': true, 'DPS': false, 'Capital': false },

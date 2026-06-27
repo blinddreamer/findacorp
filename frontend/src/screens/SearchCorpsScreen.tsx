@@ -16,14 +16,14 @@ interface Filters {
 }
 
 const TZ_OPTS = ['EU', 'US', 'AU'];
-const CONTENT_OPTS = ['Sov', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'FW Plexing', 'FW Small Gang'];
+const CONTENT_OPTS = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
 const STATUS_OPTS = ['open', 'selective', 'closed'];
 
 export default function SearchCorpsScreen() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<Filters>({
     tz: { EU: true, US: false, AU: false },
-    content: { 'Sov': false, 'Small gang': false, 'Black ops': true, 'Wormhole': false, 'Lowsec': true, 'Industry': false, 'Capital': false, 'FW Plexing': false, 'FW Small Gang': false },
+    content: { 'Null': false, 'Small gang': false, 'Black ops': true, 'Wormhole': false, 'Lowsec': true, 'Industry': false, 'Capital': false, 'Mining': false, 'Exploration': false, 'FW': false, 'FW Plexing': false, 'FW Small Gang': false },
     spReq: 100,
     status: { open: true, selective: true, closed: false },
   });

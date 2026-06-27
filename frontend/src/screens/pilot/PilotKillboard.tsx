@@ -73,7 +73,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
                 <div style={{ width: '100%', aspectRatio: '1', background: 'var(--bg-elev)', borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
                   {effectiveTypeId ? (
                     <img
-                      src={`https://images.evetech.net/types/${effectiveTypeId}/render?size=64`}
+                      src={`https://images.evetech.net/types/${effectiveTypeId}/render?size=128`}
                       alt={ship}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}

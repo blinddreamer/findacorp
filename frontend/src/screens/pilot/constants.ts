@@ -1,3 +1,3 @@
-export const ROLES = ['Fleet Cmdr', 'Logi', 'DPS', 'Capital', 'Scout', 'Tackle'];
-export const CONTENT_TYPES = ['Sov', 'Small gang', 'Black ops', 'Wormhole', 'Fleet', 'Lowsec'];
+export const ROLES = ['Logi', 'DPS', 'Capital'];
+export const CONTENT_TYPES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
 export const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
