@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.feign;
+package com.findacorp.collector.feign;
 
 import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;

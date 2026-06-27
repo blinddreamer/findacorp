@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.dto.esi;
+package com.findacorp.collector.dto.esi;
 
 import com.findacorp.collector.dto.zkill.ZKillAttacker;
 import com.findacorp.collector.dto.zkill.ZKillVictim;

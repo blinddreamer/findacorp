@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.job;
+package com.findacorp.collector.job;
 
 import com.findacorp.collector.domain.EntityType;
 import com.findacorp.collector.domain.SyncLog;

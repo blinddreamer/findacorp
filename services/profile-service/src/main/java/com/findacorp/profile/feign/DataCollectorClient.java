@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.feign;
+package com.findacorp.profile.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.service;
+package com.findacorp.profile.service;
 
 import com.findacorp.profile.domain.Corp;
 import com.findacorp.profile.domain.CorpEnriched;

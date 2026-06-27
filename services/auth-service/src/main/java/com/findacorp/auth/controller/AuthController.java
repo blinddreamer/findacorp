@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.controller;
+package com.findacorp.auth.controller;
 
 import com.findacorp.auth.dto.CharacterInfoResponse;
 import com.findacorp.auth.dto.RefreshRequest;

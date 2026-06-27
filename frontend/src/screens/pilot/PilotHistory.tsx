@@ -1,4 +1,4 @@
-﻿import { useMemo, type CSSProperties } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueries } from '@tanstack/react-query';
 import { getCorp } from '../../api/profileApi';

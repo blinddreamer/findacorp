@@ -1,4 +1,4 @@
-﻿package com.findacorp.gateway;
+package com.findacorp.gateway;
 
 import com.findacorp.gateway.config.JwtProperties;
 import org.springframework.boot.SpringApplication;

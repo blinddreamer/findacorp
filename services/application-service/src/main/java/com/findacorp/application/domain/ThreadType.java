@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.domain;
+package com.findacorp.application.domain;
 
 public enum ThreadType {
     /** A formal pilot↔corp recruitment application, with a status lifecycle. */

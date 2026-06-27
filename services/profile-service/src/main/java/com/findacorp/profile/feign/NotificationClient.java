@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.feign;
+package com.findacorp.profile.feign;
 
 import com.findacorp.profile.dto.CeoChangeNotification;
 import org.springframework.cloud.openfeign.FeignClient;

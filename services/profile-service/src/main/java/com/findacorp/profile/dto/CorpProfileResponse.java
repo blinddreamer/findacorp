@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.dto;
+package com.findacorp.profile.dto;
 
 import com.findacorp.profile.domain.Corp;
 import com.findacorp.profile.domain.CorpAllianceHistory;

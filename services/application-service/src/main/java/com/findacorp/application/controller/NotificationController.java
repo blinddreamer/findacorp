@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.controller;
+package com.findacorp.application.controller;
 
 import com.findacorp.application.dto.CeoChangeNotificationRequest;
 import com.findacorp.application.service.InboxService;

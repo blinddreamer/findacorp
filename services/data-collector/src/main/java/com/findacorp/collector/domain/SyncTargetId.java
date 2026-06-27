@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.domain;
+package com.findacorp.collector.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

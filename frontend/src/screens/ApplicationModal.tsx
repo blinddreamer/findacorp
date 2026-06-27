@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { createApplication, createDirectMessage } from '../api/applicationApi';
 import Avatar from '../components/Avatar';
 import CorpLogo from '../components/CorpLogo';

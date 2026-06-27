@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile;
+package com.findacorp.profile;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

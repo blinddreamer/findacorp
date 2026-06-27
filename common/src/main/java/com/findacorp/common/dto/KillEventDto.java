@@ -1,4 +1,4 @@
-﻿package com.findacorp.common.dto;
+package com.findacorp.common.dto;
 
 import java.time.Instant;
 

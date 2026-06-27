@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.feign;
+package com.findacorp.auth.feign;
 
 import com.findacorp.auth.dto.EveTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;

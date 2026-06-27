@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.feign;
+package com.findacorp.collector.feign;
 
 import com.findacorp.collector.dto.zkill.ZKillCharacterStats;
 import com.findacorp.collector.dto.zkill.ZKillEntry;

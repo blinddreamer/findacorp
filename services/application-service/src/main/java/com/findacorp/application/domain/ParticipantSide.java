@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.domain;
+package com.findacorp.application.domain;
 
 public enum ParticipantSide {
     /** The pilot party of a thread. */

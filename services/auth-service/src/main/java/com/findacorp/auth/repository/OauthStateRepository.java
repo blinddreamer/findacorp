@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.repository;
+package com.findacorp.auth.repository;
 
 import com.findacorp.auth.domain.OauthState;
 import org.springframework.data.jpa.repository.JpaRepository;

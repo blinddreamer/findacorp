@@ -1,4 +1,4 @@
-﻿package com.findacorp.common.messaging;
+package com.findacorp.common.messaging;
 
 public final class RabbitMQConstants {
 

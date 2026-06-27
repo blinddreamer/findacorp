@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.feign;
+package com.findacorp.auth.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;

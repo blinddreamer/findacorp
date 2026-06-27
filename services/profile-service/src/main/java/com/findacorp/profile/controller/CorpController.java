@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.controller;
+package com.findacorp.profile.controller;
 
 import com.findacorp.profile.dto.CorpProfileResponse;
 import com.findacorp.profile.dto.UpdateCorpRequest;

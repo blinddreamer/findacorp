@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.service;
+package com.findacorp.collector.service;
 
 import com.findacorp.collector.dto.esi.EsiCorpAllianceEntry;
 import com.findacorp.collector.dto.esi.EsiCorpInfo;

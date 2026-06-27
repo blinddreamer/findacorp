@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.util;
+package com.findacorp.collector.util;
 
 import org.junit.jupiter.api.Test;
 

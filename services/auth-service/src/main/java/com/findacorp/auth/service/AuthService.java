@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.service;
+package com.findacorp.auth.service;
 
 import com.findacorp.auth.config.EveSsoProperties;
 import com.findacorp.auth.domain.OauthState;

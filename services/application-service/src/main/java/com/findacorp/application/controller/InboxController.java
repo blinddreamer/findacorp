@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.controller;
+package com.findacorp.application.controller;
 
 import com.findacorp.application.dto.*;
 import com.findacorp.application.service.InboxService;

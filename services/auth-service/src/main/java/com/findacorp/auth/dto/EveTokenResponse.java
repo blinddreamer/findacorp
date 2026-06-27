@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.dto;
+package com.findacorp.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

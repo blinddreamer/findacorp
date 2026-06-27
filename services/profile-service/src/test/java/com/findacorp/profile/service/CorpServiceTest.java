@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.service;
+package com.findacorp.profile.service;
 
 import com.findacorp.common.events.CorpEnrichedEvent;
 import com.findacorp.profile.domain.Corp;

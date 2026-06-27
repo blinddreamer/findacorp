@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.repository;
+package com.findacorp.profile.repository;
 
 import com.findacorp.profile.domain.PilotCorpHistory;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.domain;
+package com.findacorp.auth.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.domain;
+package com.findacorp.profile.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

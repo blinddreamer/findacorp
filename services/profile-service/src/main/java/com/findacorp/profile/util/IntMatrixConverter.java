@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.util;
+package com.findacorp.profile.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;

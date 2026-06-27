@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.util;
+package com.findacorp.profile.util;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-﻿package com.findacorp.common.events;
+package com.findacorp.common.events;
 
 import com.findacorp.common.dto.CorpHistoryDto;
 import com.findacorp.common.dto.KillEventDto;

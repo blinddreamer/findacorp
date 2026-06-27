@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.util;
+package com.findacorp.collector.util;
 
 import java.util.ArrayList;
 import java.util.List;

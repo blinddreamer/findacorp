@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.config;
+package com.findacorp.profile.config;
 
 import com.findacorp.common.messaging.RabbitMQConstants;
 import org.springframework.amqp.core.*;

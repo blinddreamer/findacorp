@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector;
+package com.findacorp.collector;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

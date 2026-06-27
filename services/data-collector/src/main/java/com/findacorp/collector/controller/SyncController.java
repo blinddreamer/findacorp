@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.controller;
+package com.findacorp.collector.controller;
 
 import com.findacorp.collector.domain.EntityType;
 import com.findacorp.collector.domain.SyncTarget;

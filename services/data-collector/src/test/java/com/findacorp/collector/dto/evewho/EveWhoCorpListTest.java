@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.dto.evewho;
+package com.findacorp.collector.dto.evewho;
 
 import org.junit.jupiter.api.Test;
 

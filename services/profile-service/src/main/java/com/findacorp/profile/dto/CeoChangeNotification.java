@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.dto;
+package com.findacorp.profile.dto;
 
 import java.util.List;
 

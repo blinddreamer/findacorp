@@ -1,4 +1,4 @@
-﻿name: Build & Push Docker Images
+name: Build & Push Docker Images
 
 # Builds an independent Docker image for each FINDACORP service and pushes them to Docker Hub.
 # No image is built for `common` (a shared library) or the frontend.

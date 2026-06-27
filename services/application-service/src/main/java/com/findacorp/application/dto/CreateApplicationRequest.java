@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.dto;
+package com.findacorp.application.dto;
 
 import com.findacorp.application.domain.ApplicationDirection;
 

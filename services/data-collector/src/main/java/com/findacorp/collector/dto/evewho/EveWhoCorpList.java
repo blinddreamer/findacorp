@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.dto.evewho;
+package com.findacorp.collector.dto.evewho;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

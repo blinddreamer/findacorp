@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import Btn from '../../components/Btn';
 import TzRangeEditor from '../../components/TzRangeEditor';
 import { ROLES, CONTENT_TYPES, LANGUAGES } from './constants';

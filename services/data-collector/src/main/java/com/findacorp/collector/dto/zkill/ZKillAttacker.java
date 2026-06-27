@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.dto.zkill;
+package com.findacorp.collector.dto.zkill;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

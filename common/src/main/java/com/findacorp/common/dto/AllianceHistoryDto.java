@@ -1,4 +1,4 @@
-﻿package com.findacorp.common.dto;
+package com.findacorp.common.dto;
 
 public record AllianceHistoryDto(
         Long allianceId,

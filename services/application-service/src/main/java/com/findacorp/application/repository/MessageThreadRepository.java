@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.repository;
+package com.findacorp.application.repository;
 
 import com.findacorp.application.domain.ApplicationDirection;
 import com.findacorp.application.domain.ApplicationStatus;

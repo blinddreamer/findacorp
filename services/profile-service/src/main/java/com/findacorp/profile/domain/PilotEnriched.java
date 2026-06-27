@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.domain;
+package com.findacorp.profile.domain;
 
 import com.findacorp.profile.util.IntMatrixConverter;
 import com.findacorp.profile.util.IntegerListConverter;

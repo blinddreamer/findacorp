@@ -1,4 +1,4 @@
-﻿package com.findacorp.gateway.filter;
+package com.findacorp.gateway.filter;
 
 import com.findacorp.gateway.config.JwtProperties;
 import io.jsonwebtoken.Claims;

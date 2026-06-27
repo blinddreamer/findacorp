@@ -1,4 +1,4 @@
-﻿package com.findacorp.profile.messaging;
+package com.findacorp.profile.messaging;
 
 import com.findacorp.common.events.CorpEnrichedEvent;
 import com.findacorp.common.events.PilotEnrichedEvent;

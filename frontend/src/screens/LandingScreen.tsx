@@ -1,4 +1,4 @@
-﻿import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import Btn from '../components/Btn';
 import Pill from '../components/Pill';

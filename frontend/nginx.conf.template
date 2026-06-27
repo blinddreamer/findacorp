@@ -1,4 +1,4 @@
-﻿# Rendered at container start: nginx's official image runs envsubst over this template
+# Rendered at container start: nginx's official image runs envsubst over this template
 # (only ${GATEWAY_URL} is substituted; nginx's own $uri/$host vars are left intact).
 server {
     listen 80;

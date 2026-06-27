@@ -1,4 +1,4 @@
-﻿package com.findacorp.gateway.config;
+package com.findacorp.gateway.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

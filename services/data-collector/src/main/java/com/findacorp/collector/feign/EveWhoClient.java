@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.feign;
+package com.findacorp.collector.feign;
 
 import com.findacorp.collector.dto.evewho.EveWhoCorpList;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.config;
+package com.findacorp.collector.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

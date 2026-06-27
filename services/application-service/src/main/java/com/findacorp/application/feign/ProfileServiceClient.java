@@ -1,4 +1,4 @@
-﻿package com.findacorp.application.feign;
+package com.findacorp.application.feign;
 
 import com.findacorp.application.dto.CorpSummary;
 import com.findacorp.application.dto.PilotSummary;

@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.dto.esi;
+package com.findacorp.collector.dto.esi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

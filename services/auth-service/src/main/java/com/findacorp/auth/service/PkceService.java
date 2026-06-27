@@ -1,4 +1,4 @@
-﻿package com.findacorp.auth.service;
+package com.findacorp.auth.service;
 
 import org.springframework.stereotype.Component;
 

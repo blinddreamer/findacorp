@@ -1,4 +1,4 @@
-﻿package com.findacorp.collector.repository;
+package com.findacorp.collector.repository;
 
 import com.findacorp.collector.domain.SyncLog;
 import org.springframework.data.jpa.repository.JpaRepository;
