@@ -20,7 +20,7 @@ interface Filters {
 
 const TZ_OPTS = ['EU', 'US', 'AU'];
 const CONTENT_OPTS = ['Sov', 'Small gang', 'Black ops', 'Wormhole', 'Fleet', 'Lowsec'];
-const ROLE_OPTS = ['Fleet Cmdr', 'Logi', 'DPS', 'Capital', 'Scout', 'Tackle'];
+const ROLE_OPTS = ['Logi', 'DPS', 'Capital'];
 const ACTIVITY_OPTS = ['Daily', 'Weekly', 'Casual'];
 
 export default function SearchPilotsScreen() {
@@ -31,7 +31,7 @@ export default function SearchPilotsScreen() {
     content: { 'Sov': false, 'Small gang': true, 'Black ops': true, 'Wormhole': false, 'Fleet': false, 'Lowsec': false },
     minSP: 25,
     activity: { Daily: true, Weekly: false, Casual: false },
-    role: { 'Fleet Cmdr': false, 'Logi': true, 'DPS': false, 'Capital': false, 'Scout': false, 'Tackle': false },
+    role: { 'Logi': true, 'DPS': false, 'Capital': false },
     minEff: 75,
   });
 
