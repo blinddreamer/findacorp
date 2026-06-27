@@ -39,8 +39,22 @@ describe('detectRange', () => {
 });
 
 describe('hoursRange', () => {
-  it('formats sorted first to last+1, order-independent', () => {
+  it('formats a simple window, order-independent', () => {
     expect(hoursRange([20, 18, 19])).toBe('18:00 – 21:00');
+  });
+
+  it('handles a window crossing midnight without spanning the whole day', () => {
+    // 18→02 stored as {0,1,2,18..23}; the naive min/max label was "00:00 – 24:00".
+    expect(hoursRange(buildRange(18, 2))).toBe('18:00 – 03:00');
+    expect(hoursRange(buildRange(22, 3))).toBe('22:00 – 04:00');
+  });
+
+  it('renders a non-wrapping evening window as end-exclusive next hour', () => {
+    expect(hoursRange(buildRange(18, 23))).toBe('18:00 – 24:00');
+  });
+
+  it('renders a single active hour', () => {
+    expect(hoursRange([18])).toBe('18:00 – 19:00');
   });
 
   it('is empty when no hours are set', () => {

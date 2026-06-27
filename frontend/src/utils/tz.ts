@@ -12,11 +12,16 @@ export function inferTz(hours: number[]): string {
   return 'AU';
 }
 
-/** "18:00 – 24:00" label for a set of hours (sorted, so order-independent). */
+/**
+ * Human label for a set of active hours, e.g. "18:00 – 03:00". Wrap-aware: a
+ * window crossing midnight (18→02 stored as {0,1,2,18..23}) is recovered via
+ * {@link detectRange}, rather than naively spanning min→max+1 — which would
+ * render the whole day ("00:00 – 24:00") for any wrapping set.
+ */
 export function hoursRange(hours: number[]): string {
   if (!hours.length) return '';
-  const s = [...hours].sort((a, b) => a - b);
-  return `${String(s[0]).padStart(2, '0')}:00 – ${String(s[s.length - 1] + 1).padStart(2, '0')}:00`;
+  const [from, to] = detectRange(hours);
+  return `${String(from).padStart(2, '0')}:00 – ${String(to + 1).padStart(2, '0')}:00`;
 }
 
 /** Inclusive list of hours from `from` to `to`, wrapping past midnight (e.g. 22→03). */

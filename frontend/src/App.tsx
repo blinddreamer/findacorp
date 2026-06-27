@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import BrandMark from './components/BrandMark';
 import Btn from './components/Btn';
 import { useAuth, clearAccessToken } from './auth/useAuth';
+import { useIsRecruiter } from './auth/useIsRecruiter';
 import { logout } from './api/authApi';
 import { globalSearch, type GlobalSearchResult } from './api/profileApi';
 import { getUnreadCount } from './api/applicationApi';
@@ -78,6 +79,7 @@ function TopNav({ auth }: { auth: NavAuth }) {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  const isRecruiter = useIsRecruiter();
 
   useEffect(() => {
     const staticTitles: Record<string, string> = {
@@ -101,7 +103,8 @@ function TopNav({ auth }: { auth: NavAuth }) {
   const links = [
     { path: '/', label: 'Home' },
     { path: '/search/corps', label: 'Find a corp' },
-    { path: '/search/pilots', label: 'HR · find pilots' },
+    // HR tool — only a corp's CEO or appointed HR sees it.
+    ...(isRecruiter ? [{ path: '/search/pilots', label: 'HR · find pilots' }] : []),
     ...(auth.characterId ? [{ path: `/pilots/${auth.characterId}`, label: 'My profile' }] : []),
   ];
 

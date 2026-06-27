@@ -55,7 +55,7 @@ export default function TzRangeEditor({ hours, onChange }: { hours: number[]; on
         </div>
         <Stat
           label="Active window"
-          value={`${String(from).padStart(2, '0')}:00 – ${String(to).padStart(2, '0')}:59`}
+          value={`${String(from).padStart(2, '0')}:00 – ${String(to + 1).padStart(2, '0')}:00`}
           sub={`${derived.length}h · ${tz} prime`}
           accent
         />

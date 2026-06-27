@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds } from './hr';
-import type { CorpMemberEntry } from '../types/corp';
+import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, currentCorpId, isCeoOrHr } from './hr';
+import type { CorpMemberEntry, CorpProfile } from '../types/corp';
+import type { PilotProfile } from '../types/pilot';
 
 const roster: CorpMemberEntry[] = [
   { characterId: 1, characterName: 'CEO Bob' },
@@ -49,5 +50,48 @@ describe('orphanedHrIds', () => {
   });
   it('returns empty when all HR are present', () => {
     expect(orphanedHrIds([2, 3], roster, 1)).toEqual([]);
+  });
+});
+
+function histEntry(corpId: number | undefined, fromDate: string, toDate: string | null) {
+  return { corpId, fromDate, toDate, corpName: `corp-${corpId}`, alliance: null, durationLabel: '' };
+}
+
+describe('currentCorpId', () => {
+  it('returns the corp of the open (toDate null) history entry', () => {
+    const pilot = { corpHistory: [
+      histEntry(100, '2020-01-01', '2021-01-01'),
+      histEntry(200, '2021-01-01', null),
+    ] } as PilotProfile;
+    expect(currentCorpId(pilot)).toBe(200);
+  });
+  it('falls back to the most recent dated entry when none are open', () => {
+    const pilot = { corpHistory: [
+      histEntry(100, '2020-01-01', '2021-01-01'),
+      histEntry(200, '2021-06-01', '2022-01-01'),
+    ] } as PilotProfile;
+    expect(currentCorpId(pilot)).toBe(200);
+  });
+  it('returns null when history is missing or empty', () => {
+    expect(currentCorpId(undefined)).toBeNull();
+    expect(currentCorpId({ corpHistory: [] } as unknown as PilotProfile)).toBeNull();
+  });
+  it('ignores entries without a corpId', () => {
+    const pilot = { corpHistory: [histEntry(undefined, '2021-01-01', null)] } as PilotProfile;
+    expect(currentCorpId(pilot)).toBeNull();
+  });
+});
+
+describe('isCeoOrHr', () => {
+  const corp = { ceoId: 1, hrIds: [2, 3] } as CorpProfile;
+  it('is true for the CEO', () => expect(isCeoOrHr(corp, 1)).toBe(true));
+  it('is true for an appointed HR', () => expect(isCeoOrHr(corp, 2)).toBe(true));
+  it('is false for a regular member', () => expect(isCeoOrHr(corp, 9)).toBe(false));
+  it('is false when corp or character is missing', () => {
+    expect(isCeoOrHr(null, 1)).toBe(false);
+    expect(isCeoOrHr(corp, null)).toBe(false);
+  });
+  it('handles a corp with no hrIds', () => {
+    expect(isCeoOrHr({ ceoId: 1 } as CorpProfile, 2)).toBe(false);
   });
 });

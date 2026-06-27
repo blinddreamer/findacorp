@@ -21,6 +21,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class CorpService {
     private final CorpMemberSnapshotRepository memberSnapshotRepository;
     private final CorpMemberRepository memberRepository;
     private final CorpMemberEventRepository memberEventRepository;
+    private final PilotCorpHistoryRepository pilotCorpHistoryRepository;
     private final NotificationClient notificationClient;
 
     /**
@@ -59,6 +61,36 @@ public class CorpService {
     public boolean isCeoKnown(Long corpId) {
         return corpEnrichedRepository.findById(corpId)
                 .map(e -> e.getCeoId() != null).orElse(false);
+    }
+
+    /**
+     * Whether {@code characterId} holds a recruiter role — i.e. is the CEO or an
+     * appointed HR of their current corp. Gates HR-only features such as pilot search.
+     * Mirrors the frontend {@code useIsRecruiter} check; returns false when the caller
+     * has no known corp or that corp has not synced yet.
+     */
+    public boolean isRecruiter(Long characterId) {
+        if (characterId == null) return false;
+        Long corpId = currentCorpId(characterId);
+        return corpId != null && canEdit(corpId, characterId);
+    }
+
+    /**
+     * The caller's current corp id, from their corp history: the open entry
+     * (no to-date), falling back to the most recent dated entry. History is ordered
+     * from-date descending, so the first non-null corp id is the most recent.
+     */
+    private Long currentCorpId(Long characterId) {
+        List<PilotCorpHistory> history = pilotCorpHistoryRepository.findByCharacterIdOrderByFromDateDesc(characterId);
+        return history.stream()
+            .filter(h -> h.getToDate() == null && h.getCorpId() != null)
+            .map(PilotCorpHistory::getCorpId)
+            .findFirst()
+            .orElseGet(() -> history.stream()
+                .map(PilotCorpHistory::getCorpId)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null));
     }
 
     public CorpProfileResponse getProfile(Long corpId) {

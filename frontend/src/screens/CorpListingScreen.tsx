@@ -12,13 +12,7 @@ import CorpMembers from './corp/CorpMembers';
 import CorpKillboard from './corp/CorpKillboard';
 import CorpHistory from './corp/CorpHistory';
 import { inferTz } from '../utils/tz';
-
-// ── Permission feature flag ───────────────────────────────────────────────────
-// false = dev mode: any logged-in user may edit
-// true  = prod mode: CEO or appointed HR only (non-members see "Apply" instead)
-// NOTE: keep in sync with the backend `app.corp-edit-restricted` property — the
-// backend enforces this independently; flipping it here only hides the UI.
-const CORP_EDIT_RESTRICTED = true;
+import { CORP_EDIT_RESTRICTED } from '../config';
 
 export default function CorpListingScreen() {
   const { corpId } = useParams<{ corpId: string }>();

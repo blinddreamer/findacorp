@@ -1,7 +1,14 @@
 name: Build & Push Docker Images
 
 # Builds an independent Docker image for each FINDACORP service and pushes them to Docker Hub.
-# No image is built for `common` (a shared library) or the frontend.
+# No image is built for `common` (a shared library).
+#
+# Only the services affected by a push are rebuilt:
+#   - a change under services/<svc>/**            -> rebuilds just that service
+#   - a change to common/**, the parent pom.xml,  -> rebuilds ALL services (they all depend on it)
+#     the Dockerfile, or this workflow
+#   - a change under frontend/**                   -> rebuilds just the frontend
+#   - a tag push (v*) or a manual run             -> rebuilds everything (full release / forced run)
 #
 # Required repository secrets:
 #   DOCKERHUB_USERNAME  - your Docker Hub username (also the image namespace)
@@ -27,8 +34,71 @@ env:
   IMAGE_PREFIX: findacorp
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.decide.outputs.services }}   # JSON array of service names to build
+      frontend: ${{ steps.decide.outputs.frontend }}   # "true" / "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'pom.xml'
+              - 'common/**'
+              - 'Dockerfile'
+              - '.github/workflows/docker-images.yml'
+            eureka-server:
+              - *shared
+              - 'services/eureka-server/**'
+            api-gateway:
+              - *shared
+              - 'services/api-gateway/**'
+            auth-service:
+              - *shared
+              - 'services/auth-service/**'
+            profile-service:
+              - *shared
+              - 'services/profile-service/**'
+            data-collector:
+              - *shared
+              - 'services/data-collector/**'
+            application-service:
+              - *shared
+              - 'services/application-service/**'
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/docker-images.yml'
+
+      - name: Decide what to build
+        id: decide
+        env:
+          CHANGES: ${{ steps.filter.outputs.changes }}
+        run: |
+          ALL='["eureka-server","api-gateway","auth-service","profile-service","data-collector","application-service"]'
+          if [ "${{ github.ref_type }}" = "tag" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Full build for releases and manual runs.
+            echo "services=$ALL" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            # "shared" and "frontend" are filters, not buildable service modules — drop them.
+            SERVICES=$(echo "$CHANGES" | jq -c 'map(select(. != "frontend" and . != "shared"))')
+            echo "services=$SERVICES" >> "$GITHUB_OUTPUT"
+            if echo "$CHANGES" | jq -e 'index("frontend")' >/dev/null; then
+              echo "frontend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "frontend=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
   build:
     name: Build jars
+    needs: changes
+    if: needs.changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,13 +110,20 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Build all modules
-        run: mvn -B -ntp -DskipTests clean package
+      - name: Build changed modules
+        env:
+          SERVICES: ${{ needs.changes.outputs.services }}
+        run: |
+          # -am also-makes the `common` dependency the services need.
+          PL=$(echo "$SERVICES" | jq -r 'map("services/" + .) | join(",")')
+          mvn -B -ntp -DskipTests -pl "$PL" -am clean package
 
       - name: Stage service jars
+        env:
+          SERVICES: ${{ needs.changes.outputs.services }}
         run: |
           mkdir -p dist
-          for s in eureka-server api-gateway auth-service profile-service data-collector application-service; do
+          for s in $(echo "$SERVICES" | jq -r '.[]'); do
             cp services/"$s"/target/"$s"-*.jar dist/"$s".jar
           done
 
@@ -59,18 +136,13 @@ jobs:
 
   images:
     name: Image (${{ matrix.service }})
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        service:
-          - eureka-server
-          - api-gateway
-          - auth-service
-          - profile-service
-          - data-collector
-          - application-service
+        service: ${{ fromJSON(needs.changes.outputs.services) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -111,6 +183,8 @@ jobs:
 
   frontend:
     name: Image (frontend)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

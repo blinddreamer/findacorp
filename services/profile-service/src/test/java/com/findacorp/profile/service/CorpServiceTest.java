@@ -5,6 +5,7 @@ import com.findacorp.profile.domain.Corp;
 import com.findacorp.profile.domain.CorpEnriched;
 import com.findacorp.profile.domain.CorpMember;
 import com.findacorp.profile.domain.CorpMemberEvent;
+import com.findacorp.profile.domain.PilotCorpHistory;
 import com.findacorp.profile.feign.NotificationClient;
 import com.findacorp.profile.repository.*;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ class CorpServiceTest {
     @Mock CorpMemberSnapshotRepository memberSnapshotRepository;
     @Mock CorpMemberRepository memberRepository;
     @Mock CorpMemberEventRepository memberEventRepository;
+    @Mock PilotCorpHistoryRepository pilotCorpHistoryRepository;
     @Mock NotificationClient notificationClient;
     @InjectMocks CorpService corpService;
 
@@ -75,6 +77,56 @@ class CorpServiceTest {
     @Test
     void canEdit_falseForNullCharacter() {
         assertThat(corpService.canEdit(1L, null)).isFalse();
+    }
+
+    // ── isRecruiter: CEO/HR of the caller's current corp ──────────────────────
+
+    private PilotCorpHistory currentCorp(long characterId, long corpId) {
+        return new PilotCorpHistory(characterId, corpId, "Corp", null, "2020-01-01", null, "");
+    }
+
+    @Test
+    void isRecruiter_trueWhenCeoOfCurrentCorp() {
+        when(pilotCorpHistoryRepository.findByCharacterIdOrderByFromDateDesc(100L))
+            .thenReturn(List.of(currentCorp(100L, 1L)));
+        when(corpEnrichedRepository.findById(1L)).thenReturn(Optional.of(enrichedWithCeo(1L, 100L)));
+        assertThat(corpService.isRecruiter(100L)).isTrue();
+    }
+
+    @Test
+    void isRecruiter_trueWhenAppointedHrOfCurrentCorp() {
+        when(pilotCorpHistoryRepository.findByCharacterIdOrderByFromDateDesc(201L))
+            .thenReturn(List.of(currentCorp(201L, 1L)));
+        when(corpEnrichedRepository.findById(1L)).thenReturn(Optional.empty());
+        Corp c = new Corp();
+        c.setCorpId(1L);
+        c.setHrIds(List.of(201L));
+        when(corpRepository.findById(1L)).thenReturn(Optional.of(c));
+        assertThat(corpService.isRecruiter(201L)).isTrue();
+    }
+
+    @Test
+    void isRecruiter_falseForRegularMember() {
+        when(pilotCorpHistoryRepository.findByCharacterIdOrderByFromDateDesc(999L))
+            .thenReturn(List.of(currentCorp(999L, 1L)));
+        when(corpEnrichedRepository.findById(1L)).thenReturn(Optional.empty());
+        Corp c = new Corp();
+        c.setCorpId(1L);
+        c.setHrIds(List.of(201L));
+        when(corpRepository.findById(1L)).thenReturn(Optional.of(c));
+        assertThat(corpService.isRecruiter(999L)).isFalse();
+    }
+
+    @Test
+    void isRecruiter_falseWhenNoCorpHistory() {
+        when(pilotCorpHistoryRepository.findByCharacterIdOrderByFromDateDesc(100L))
+            .thenReturn(List.of());
+        assertThat(corpService.isRecruiter(100L)).isFalse();
+    }
+
+    @Test
+    void isRecruiter_falseForNullCharacter() {
+        assertThat(corpService.isRecruiter(null)).isFalse();
     }
 
     @Test

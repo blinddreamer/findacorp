@@ -1,4 +1,27 @@
-import type { CorpMemberEntry } from '../types/corp';
+import type { CorpMemberEntry, CorpProfile } from '../types/corp';
+import type { PilotProfile } from '../types/pilot';
+
+/**
+ * The pilot's current corp id, taken from their corp history: the open entry
+ * (toDate === null). Falls back to the most recent dated entry when none are
+ * open, and ignores entries without a corpId (e.g. unresolved NPC corps).
+ */
+export function currentCorpId(pilot?: PilotProfile | null): number | null {
+  const history = pilot?.corpHistory;
+  if (!history?.length) return null;
+  const open = history.find(h => h.toDate == null && h.corpId != null);
+  if (open?.corpId != null) return open.corpId;
+  const dated = history.filter(h => h.corpId != null);
+  if (!dated.length) return null;
+  const latest = dated.reduce((a, b) => (a.fromDate >= b.fromDate ? a : b));
+  return latest.corpId ?? null;
+}
+
+/** True when the character is the corp's CEO or one of its appointed HR. */
+export function isCeoOrHr(corp: CorpProfile | null | undefined, characterId: number | null): boolean {
+  if (!corp || characterId == null) return false;
+  return corp.ceoId === characterId || (corp.hrIds ?? []).includes(characterId);
+}
 
 /** Add id if absent, remove if present — toggle semantics for HR appointment. */
 export function toggleId(ids: number[], id: number): number[] {

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { searchPilots } from '../api/profileApi';
 import type { PilotSearchResult } from '../types/pilot';
+import { useRecruiterStatus } from '../auth/useIsRecruiter';
 import Avatar from '../components/Avatar';
 import Pill from '../components/Pill';
 import Btn from '../components/Btn';
@@ -25,6 +26,7 @@ const ACTIVITY_OPTS = ['Daily', 'Weekly', 'Casual'];
 
 export default function SearchPilotsScreen() {
   const navigate = useNavigate();
+  const { isRecruiter, isResolved } = useRecruiterStatus();
   const [showListingModal, setShowListingModal] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     tz: { EU: true, US: false, AU: false },
@@ -51,8 +53,17 @@ export default function SearchPilotsScreen() {
       roles: activeRoles || undefined,
       content: activeContent || undefined,
     }),
+    enabled: isRecruiter, // don't fire the (server-gated) search for non-recruiters
     staleTime: 2 * 60 * 1000,
   });
+
+  // Recruiter-only screen: wait for resolution, then bounce non-CEO/HR users home.
+  if (!isResolved) {
+    return <div className="page"><div className="mono" style={{ color: 'var(--text-dim)' }}>Checking access…</div></div>;
+  }
+  if (!isRecruiter) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="page">
