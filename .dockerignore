@@ -51,6 +51,7 @@ bash.exe.stackdump
 CLAUDE.md
 .claudeignore
 claude.json
+docs/
 
 # ─── Docs / misc project files ───────────────────────────────
 *.md
