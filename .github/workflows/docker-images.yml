@@ -95,7 +95,6 @@ jobs:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,format=short
             type=ref,event=tag
 
       - name: Build & push
@@ -131,7 +130,6 @@ jobs:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_PREFIX }}-frontend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,format=short
             type=ref,event=tag
 
       - name: Build & push
