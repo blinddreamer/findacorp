@@ -26,10 +26,10 @@ public class PilotCorpHistory {
     @Column(length = 255)
     private String alliance;
 
-    @Column(name = "from_date", length = 10)
+    @Column(name = "`from_date`", length = 10)
     private String fromDate;
 
-    @Column(name = "to_date", length = 10)
+    @Column(name = "`to_date`", length = 10)
     private String toDate;
 
     @Column(name = "duration_label", length = 50)

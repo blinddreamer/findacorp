@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS pilot_corp_history (
     corp_id        BIGINT,
     corp_name      VARCHAR(255),
     alliance       VARCHAR(255),
-    from_date      VARCHAR(10),
-    to_date        VARCHAR(10),
+    `from_date`    VARCHAR(10),
+    `to_date`      VARCHAR(10),
     duration_label VARCHAR(50),
     INDEX idx_pch_char (character_id)
 );

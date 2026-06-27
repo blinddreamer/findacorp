@@ -29,7 +29,7 @@ eve:
     token-url: https://login.eveonline.com/v2/oauth/token
     verify-url: https://login.eveonline.com/oauth/verify
     scopes: "publicData esi-skills.read_skills.v1"
-    callback-url: http://localhost:3000/callback
+    callback-url: ${CALLBACK_URL:http://localhost:3000/callback}
 
 jwt:
   secret: ${JWT_SECRET}
