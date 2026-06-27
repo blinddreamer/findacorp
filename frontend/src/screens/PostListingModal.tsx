@@ -7,8 +7,8 @@ import Pill from '../components/Pill';
 import Btn from '../components/Btn';
 import TzRangeEditor from '../components/TzRangeEditor';
 
-const CONTENT_TYPES = ['Sov', 'Small gang', 'Black ops', 'Wormhole', 'Fleet', 'Lowsec', 'FW', 'Capital'];
-const CORP_ROLES_WANTED = ['Fleet Cmdr', 'Logi', 'DPS', 'Capital pilot', 'Scout', 'Industrialist', 'Dictor', 'Booster'];
+const CONTENT_TYPES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
+const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
 
 type Phase = 'resolving' | 'editing' | 'done';
