@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import Btn from '../../components/Btn';
 import TzRangeEditor from '../../components/TzRangeEditor';
 import { ROLES, CONTENT_TYPES, LANGUAGES } from './constants';
@@ -42,7 +42,7 @@ export default function OnboardingModal({ onSave, onSkip }: OnboardingModalProps
   return (
     <div className="modal-shade">
       <div className="modal" style={{ width: 560 }}>
-        <div className="eyebrow accent">// welcome to drydock · profile setup</div>
+        <div className="eyebrow accent">// welcome to findacorp · profile setup</div>
         <h2 style={{ marginTop: 8, fontSize: 22 }}>{stepTitle}</h2>
         <p className="muted" style={{ fontSize: 13, marginTop: 6, lineHeight: 1.5 }}>{stepDesc}</p>
 

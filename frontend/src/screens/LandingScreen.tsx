@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+﻿import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import Btn from '../components/Btn';
 import Pill from '../components/Pill';
@@ -15,10 +15,10 @@ export default function LandingScreen() {
   return (
     <div className="page" style={{ paddingTop: 0 }}>
       <section className="hero">
-        <div className="eyebrow accent">// DRYDOCK · v1.0 · pilots online</div>
+        <div className="eyebrow accent">// FINDACORP · v1.0 · pilots online</div>
         <h1>Stop ratting alone. Find your fleet.</h1>
         <p className="lede">
-          DRYDOCK is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type, doctrine ownership.
+          FINDACORP is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type, doctrine ownership.
         </p>
         <div className="ctas">
           {!auth.token && (
@@ -66,7 +66,7 @@ export default function LandingScreen() {
       </div>
 
       <div style={{ marginTop: 56, padding: 32, border: '1px solid var(--border-soft)', borderRadius: 'var(--radius-lg)', background: 'var(--bg-panel)' }}>
-        <div className="eyebrow">// what makes drydock different</div>
+        <div className="eyebrow">// what makes findacorp different</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, marginTop: 18 }}>
           <div>
             <h3 style={{ marginBottom: 10 }}>Honest, not friendly</h3>

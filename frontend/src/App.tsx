@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+﻿import { useEffect, useState, useRef, useCallback } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import BrandMark from './components/BrandMark';
@@ -90,7 +90,7 @@ function TopNav({ auth }: { auth: NavAuth }) {
     <nav className="topnav">
       <div className="brand" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
         <span className="brand-mark"><BrandMark /></span>
-        <span>DRYDOCK</span>
+        <span>FINDACORP</span>
       </div>
       <div className="nav-links">
         {links.map(l => (

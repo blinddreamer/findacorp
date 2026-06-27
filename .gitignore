@@ -44,3 +44,9 @@ logs/
 Thumbs.db
 *.stackdump
 bash.exe.stackdump
+
+# ─── Claude ──────────────────────────────────────────────────
+.claude/
+CLAUDE.md
+.claudeignore
+claude.json

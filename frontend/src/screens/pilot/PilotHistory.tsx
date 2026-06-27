@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from 'react';
+﻿import { useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueries } from '@tanstack/react-query';
 import { getCorp } from '../../api/profileApi';
@@ -8,7 +8,7 @@ function isNpcCorp(corpId?: number): boolean {
   return corpId != null && corpId < 2_000_000;
 }
 
-function CorpNameLink({ corpId, corpName, inDrydock }: { corpId?: number; corpName: string; inDrydock?: boolean }) {
+function CorpNameLink({ corpId, corpName, inFindacorp }: { corpId?: number; corpName: string; inFindacorp?: boolean }) {
   const npc = isNpcCorp(corpId);
   const linkStyle: CSSProperties = {
     color: npc ? 'var(--text-mute)' : 'var(--accent-text)',
@@ -29,7 +29,7 @@ function CorpNameLink({ corpId, corpName, inDrydock }: { corpId?: number; corpNa
     return <><b>{corpName}</b>{badge}</>;
   }
 
-  if (npc || !inDrydock) {
+  if (npc || !inFindacorp) {
     return (
       <a href={`https://evewho.com/corporation/${corpId}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
         {corpName}{badge}
@@ -66,7 +66,7 @@ export default function PilotHistory({ p }: { p: PilotProfile }) {
     })),
   });
 
-  const drydockIds = useMemo(() => {
+  const findacorpIds = useMemo(() => {
     const set = new Set<number>();
     corpChecks.forEach((q, i) => { if (q.isSuccess) set.add(playerCorpIds[i]); });
     return set;
@@ -89,7 +89,7 @@ export default function PilotHistory({ p }: { p: PilotProfile }) {
                 <CorpNameLink
                   corpId={h.corpId}
                   corpName={h.corpName}
-                  inDrydock={h.corpId != null ? drydockIds.has(h.corpId) : false}
+                  inFindacorp={h.corpId != null ? findacorpIds.has(h.corpId) : false}
                 />
                 {h.alliance && <span> · <span className="muted">{h.alliance}</span></span>}
               </div>

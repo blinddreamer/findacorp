@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -139,7 +139,7 @@ function ThreadRow({
 }) {
   const isSystem = thread.type === 'SYSTEM';
   const name = isSystem
-    ? (thread.subject ?? thread.corpName ?? 'DRYDOCK')
+    ? (thread.subject ?? thread.corpName ?? 'FINDACORP')
     : counterpartName(thread);
   // Show the counterpart's avatar: if I'm the corp side, the counterpart is a pilot.
   // System notifications use the corp glyph rather than a pilot portrait.
@@ -234,7 +234,7 @@ function ThreadPanel({
     : isCorp && thread.pilotId ? `/pilots/${thread.pilotId}`
     : isPilot && thread.corpId ? `/corps/${thread.corpId}`
     : null;
-  const headerName = isSystem ? (thread.subject ?? 'DRYDOCK') : counterpartName(thread);
+  const headerName = isSystem ? (thread.subject ?? 'FINDACORP') : counterpartName(thread);
 
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>

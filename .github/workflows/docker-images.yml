@@ -1,13 +1,13 @@
-name: Build & Push Docker Images
+﻿name: Build & Push Docker Images
 
-# Builds an independent Docker image for each DRYDOCK service and pushes them to Docker Hub.
+# Builds an independent Docker image for each FINDACORP service and pushes them to Docker Hub.
 # No image is built for `common` (a shared library) or the frontend.
 #
 # Required repository secrets:
 #   DOCKERHUB_USERNAME  - your Docker Hub username (also the image namespace)
 #   DOCKERHUB_TOKEN     - a Docker Hub access token with read/write scope
 #
-# Images are published as:  docker.io/<DOCKERHUB_USERNAME>/drydock-<service>
+# Images are published as:  docker.io/<DOCKERHUB_USERNAME>/findacorp-<service>
 # Tagged with: `latest` (default branch only), the short commit SHA, and the git tag on v* tags.
 
 on:
@@ -24,7 +24,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_PREFIX: drydock
+  IMAGE_PREFIX: findacorp
 
 jobs:
   build:

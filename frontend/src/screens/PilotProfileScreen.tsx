@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPilot, updatePilot } from '../api/profileApi';
@@ -64,7 +64,7 @@ export default function PilotProfileScreen() {
 
   useEffect(() => {
     if (!p || !isOwner) return;
-    const key = `drydock_onboarding_done_${id}`;
+    const key = `findacorp_onboarding_done_${id}`;
     if (localStorage.getItem(key)) return;
     const isEmpty = !p.bio && !p.roles?.length && !p.content?.length && !p.manualTzActive?.length;
     if (isEmpty) setShowOnboarding(true);
@@ -269,11 +269,11 @@ export default function PilotProfileScreen() {
               await updatePilot({ manualTzActive: hours, roles, content, languages });
               await queryClient.invalidateQueries({ queryKey: ['pilot', id] });
             } catch { /* non-fatal */ }
-            localStorage.setItem(`drydock_onboarding_done_${id}`, '1');
+            localStorage.setItem(`findacorp_onboarding_done_${id}`, '1');
             setShowOnboarding(false);
           }}
           onSkip={() => {
-            localStorage.setItem(`drydock_onboarding_done_${id}`, '1');
+            localStorage.setItem(`findacorp_onboarding_done_${id}`, '1');
             setShowOnboarding(false);
           }}
         />

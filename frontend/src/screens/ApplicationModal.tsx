@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { createApplication, createDirectMessage } from '../api/applicationApi';
 import Avatar from '../components/Avatar';
 import CorpLogo from '../components/CorpLogo';
@@ -28,7 +28,7 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState(
     ctx.mode === 'contact-pilot'
-      ? 'Saw your profile on DRYDOCK. We\'re recruiting and your TZ and fit are a match. Open to a Mumble chat?\n\n— Recruiter'
+      ? 'Saw your profile on FINDACORP. We\'re recruiting and your TZ and fit are a match. Open to a Mumble chat?\n\n— Recruiter'
       : 'EUTZ pilot looking for a good corp. References available. Fly safe — Pilot'
   );
 
@@ -98,7 +98,7 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
                 value={message}
                 onChange={e => setMessage(e.target.value)}
               />
-              <div className="muted mono" style={{ fontSize: 11, marginTop: 6 }}>{message.length} chars · sent as DRYDOCK inbox message</div>
+              <div className="muted mono" style={{ fontSize: 11, marginTop: 6 }}>{message.length} chars · sent as FINDACORP inbox message</div>
             </div>
 
             {error && (
@@ -124,7 +124,7 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
             <h2 style={{ fontSize: 22 }}>Sent. Fly safe.</h2>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 10, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
               {isPilotContact
-                ? `${ctx.targetName} will see your message in their DRYDOCK inbox. Most pilots reply within 24h.`
+                ? `${ctx.targetName} will see your message in their FINDACORP inbox. Most pilots reply within 24h.`
                 : `Your application is now in the recruiter queue. They typically reply within 12h.`}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 22 }}>

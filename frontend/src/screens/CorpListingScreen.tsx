@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCorp, updateCorp, getPilot, syncCorp } from '../api/profileApi';
@@ -170,7 +170,7 @@ export default function CorpListingScreen() {
         <div style={{ marginBottom: 16, padding: '10px 14px', background: 'var(--bg-base)', border: '1px solid var(--bad, #e05252)', borderRadius: 6, fontSize: 12.5, color: 'var(--text-mid)', lineHeight: 1.5 }}>
           <b style={{ color: 'var(--bad, #e05252)' }}>⚠ CEO change detected.</b>{' '}
           This corp's CEO recently changed and the new CEO hasn't signed in yet — roster and member
-          sync are paused until they log into DRYDOCK.
+          sync are paused until they log into FINDACORP.
         </div>
       )}
 

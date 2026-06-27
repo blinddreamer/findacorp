@@ -1,4 +1,4 @@
-# Runtime image for a DRYDOCK Spring Boot service.
+﻿# Runtime image for a FINDACORP Spring Boot service.
 #
 # This is a thin runtime-only image: CI builds the executable jars with Maven, stages
 # each one as <SERVICE>.jar in the build context, and this Dockerfile wraps it. Build with:
