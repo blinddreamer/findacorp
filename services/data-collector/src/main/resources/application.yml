@@ -34,9 +34,6 @@ zkill:
 evewho:
   base-url: https://evewho.com/api
 
-auth-service:
-  url: ${AUTH_SERVICE_URL}
-
 eureka:
   client:
     service-url:
