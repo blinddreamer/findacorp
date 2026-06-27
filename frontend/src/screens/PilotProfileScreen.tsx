@@ -50,6 +50,10 @@ export default function PilotProfileScreen() {
   });
 
   useEffect(() => {
+    if (p?.name) document.title = `${p.name} · FINDACORP`;
+  }, [p?.name]);
+
+  useEffect(() => {
     if (isError && id === auth.characterId && !stubAttempted.current) {
       stubAttempted.current = true;
       setCreatingStub(true);

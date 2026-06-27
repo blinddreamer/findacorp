@@ -79,6 +79,25 @@ function TopNav({ auth }: { auth: NavAuth }) {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  useEffect(() => {
+    const staticTitles: Record<string, string> = {
+      '/': 'FINDACORP',
+      '/search/corps': 'Find a Corp · FINDACORP',
+      '/search/pilots': 'Find Pilots · FINDACORP',
+      '/inbox': 'Inbox · FINDACORP',
+    };
+    const title = staticTitles[currentPath];
+    if (title) {
+      document.title = title;
+    } else if (currentPath.startsWith('/pilots/')) {
+      document.title = 'Pilot · FINDACORP';
+    } else if (currentPath.startsWith('/corps/')) {
+      document.title = 'Corp · FINDACORP';
+    } else {
+      document.title = 'FINDACORP';
+    }
+  }, [currentPath]);
+
   const links = [
     { path: '/', label: 'Home' },
     { path: '/search/corps', label: 'Find a corp' },

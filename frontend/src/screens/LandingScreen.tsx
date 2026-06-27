@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import Avatar from '../components/Avatar';
 import Btn from '../components/Btn';
 import Pill from '../components/Pill';
 import { useAuth } from '../auth/useAuth';
@@ -18,7 +17,7 @@ export default function LandingScreen() {
         <div className="eyebrow accent">// FINDACORP · v1.0 · pilots online</div>
         <h1>Stop ratting alone. Find your fleet.</h1>
         <p className="lede">
-          FINDACORP is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type, doctrine ownership.
+          FINDACORP is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type.
         </p>
         <div className="ctas">
           {!auth.token && (
@@ -44,13 +43,7 @@ export default function LandingScreen() {
         <div className="cell"><div className="k">Tranquility status</div><div className="v" style={{ fontSize: 14, color: 'var(--good)' }}>● Online</div></div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 32 }}>
-        <FeatureCard
-          tag="01 — FOR PILOTS"
-          title="A profile that says more than your killboard."
-          body="Pull your skills, ships flown, corp history, and recent kills automatically. Add the human stuff — when you log in, what you want to fly, whether you'll suffer through structure timers."
-          example={<MiniProfile />}
-        />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 32 }}>
         <FeatureCard
           tag="02 — FOR CORP HR"
           title="Search by timezone overlap, not by SP number."
@@ -71,7 +64,7 @@ export default function LandingScreen() {
           <div>
             <h3 style={{ marginBottom: 10 }}>Honest, not friendly</h3>
             <p className="muted" style={{ fontSize: 14, lineHeight: 1.6 }}>
-              Corps mark themselves <Pill kind="good">open</Pill>, <Pill kind="accent">selective</Pill>, or <Pill kind="danger">closed</Pill>. No false hope. If you're an alpha clone applying to Snuffed Out, the listing says so.
+              Corps mark themselves <Pill kind="good">open</Pill>, <Pill kind="accent">selective</Pill>, or <Pill kind="danger">closed</Pill>. No false hope.
             </p>
           </div>
           <div>
@@ -97,19 +90,6 @@ function FeatureCard({ tag, title, body, example }: { tag: string; title: string
       <h3 style={{ fontSize: 22, lineHeight: 1.2 }}>{title}</h3>
       <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>{body}</p>
       <div style={{ marginTop: 'auto', paddingTop: 10 }}>{example}</div>
-    </div>
-  );
-}
-
-function MiniProfile() {
-  return (
-    <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border-soft)', borderRadius: 6, padding: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
-      <Avatar seed="vex" size={44} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 500 }}>Vex Mortlake</div>
-        <div className="mono" style={{ fontSize: 11, color: 'var(--text-mute)' }}>47.2M SP · EUTZ · FC / Logi</div>
-      </div>
-      <Pill kind="good"><span className="dot" />online</Pill>
     </div>
   );
 }

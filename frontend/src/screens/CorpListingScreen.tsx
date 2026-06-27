@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCorp, updateCorp, getPilot, syncCorp } from '../api/profileApi';
@@ -50,6 +50,10 @@ export default function CorpListingScreen() {
     staleTime: 5 * 60 * 1000,
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (c?.name) document.title = `${c.name} · FINDACORP`;
+  }, [c?.name]);
 
   const { data: myPilot } = useQuery({
     queryKey: ['pilot', auth.characterId],
