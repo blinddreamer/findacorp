@@ -43,10 +43,10 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
   }, [topShips]);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-      <div className="card" style={{ alignSelf: 'start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="card">
         <div className="section-head"><h3>Lifetime stats</h3><span className="label">/ zkillboard</span></div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
           {p.kbKills != null && <Stat label="Kills" value={p.kbKills.toLocaleString()} accent />}
           {p.kbLosses != null && <Stat label="Losses" value={p.kbLosses.toLocaleString()} />}
           {p.kbEfficiency != null && (
@@ -63,7 +63,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
         </div>
       )}
       {topShips.length > 0 && (
-        <div className="card" style={{ gridColumn: '1 / -1' }}>
+        <div className="card">
           <div className="section-head"><h3>Top ships flown</h3><span className="label">/ from kill history</span></div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
             {topShips.map(({ ship, kills, losses, typeId }) => {
