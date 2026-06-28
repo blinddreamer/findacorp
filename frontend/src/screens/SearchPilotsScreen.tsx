@@ -168,7 +168,7 @@ export default function SearchPilotsScreen() {
 function PilotResultRow({ p, onClick }: { p: PilotSearchResult; onClick: () => void }) {
   return (
     <div className="pilot-card" onClick={onClick} style={{ gridTemplateColumns: '56px 1fr auto auto' }}>
-      <Avatar seed={p.name ?? String(p.characterId)} size={56} />
+      <Avatar characterId={p.characterId} seed={p.name ?? String(p.characterId)} size={56} />
       <div>
         <div className="name">
           {p.name ?? `Pilot #${p.characterId}`}

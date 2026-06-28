@@ -1,10 +1,29 @@
+import { useState } from 'react';
+
 interface AvatarProps {
+  characterId?: number | null;
   seed?: string;
   size?: number;
   label?: string;
 }
 
-export default function Avatar({ seed = 'x', size = 56, label }: AvatarProps) {
+export default function Avatar({ characterId, seed = 'x', size = 56, label }: AvatarProps) {
+  const [failed, setFailed] = useState(false);
+
+  // Render the real EVE character portrait when we have an id; fall back to the
+  // generated identicon if there's no id or the image fails to load.
+  if (characterId && !failed) {
+    return (
+      <img
+        src={`https://images.evetech.net/characters/${characterId}/portrait?size=128`}
+        alt={seed}
+        onError={() => setFailed(true)}
+        className="gavatar"
+        style={{ width: size, height: size, objectFit: 'cover', display: 'block' }}
+      />
+    );
+  }
+
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   const rand = (n = 1) => { h = (h * 1664525 + 1013904223) >>> 0; return (h / 4294967295) * n; };

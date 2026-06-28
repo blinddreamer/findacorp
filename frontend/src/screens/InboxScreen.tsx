@@ -160,7 +160,7 @@ function ThreadRow({
       }}
     >
       {counterpartIsPilot
-        ? <Avatar seed={name} size={40} />
+        ? <Avatar characterId={thread.pilotId} seed={name} size={40} />
         : <CorpLogo corpId={thread.corpId} seed={name} size={40} />
       }
       <div style={{ minWidth: 0 }}>
