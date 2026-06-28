@@ -198,9 +198,9 @@ export default function PilotProfileScreen() {
         <div style={{ width: 220 }}>
           <Portrait id={p.characterId} name={p.name} />
         </div>
-        <div className="ident">
+        <div className="ident" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {p.title && (
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--bad, #e05252)', textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: 2 }}>
               {p.title}
             </div>
           )}
