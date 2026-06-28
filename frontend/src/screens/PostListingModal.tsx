@@ -8,7 +8,7 @@ import Btn from '../components/Btn';
 import TzRangeEditor from '../components/TzRangeEditor';
 import { parseRequirement, formatRequirement } from '../utils/requirements';
 
-const CONTENT_TYPES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
+const CONTENT_TYPES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
 

@@ -8,7 +8,7 @@ import { inferTz, hoursRange } from '../../utils/tz';
 import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, MAX_HR } from '../../utils/hr';
 import { parseRequirement, formatRequirement, splitRequirement } from '../../utils/requirements';
 
-const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
+const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
 

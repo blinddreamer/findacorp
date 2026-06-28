@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Btn from '../components/Btn';
 import Pill from '../components/Pill';
@@ -6,6 +7,7 @@ import { useAuth } from '../auth/useAuth';
 export default function LandingScreen() {
   const navigate = useNavigate();
   const auth = useAuth();
+  const [role, setRole] = useState<'pilot' | 'corp'>('pilot');
 
   function login() {
     window.location.href = '/api/auth/login';
@@ -13,25 +15,77 @@ export default function LandingScreen() {
 
   return (
     <div className="page" style={{ paddingTop: 0 }}>
-      <section className="hero">
-        <div className="eyebrow accent">// FINDACORP · v1.0 · pilots online</div>
-        <h1>Stop ratting alone. Find your fleet.</h1>
-        <p className="lede">
-          FINDACORP is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type.
-        </p>
-        <div className="ctas">
-          {!auth.token && (
-            <Btn primary lg onClick={login}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2 L20 7 V17 L12 22 L4 17 V7 Z" /><circle cx="12" cy="12" r="3" /></svg>
-              Log in with EVE SSO
+      <section className="hero" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center' }}>
+        <div>
+          <div className="eyebrow accent">// FINDACORP · v1.0 · pilots online</div>
+          <h1>Find your fleet.</h1>
+          <p className="lede">
+            FINDACORP is a third-party recruitment platform for New Eden. Pilots build a real profile from ESI + zKill data — no more "20m SP DPS LFC" forum posts. Corp HR searches by what actually matters: timezone overlap, content type.
+          </p>
+          <div className="ctas">
+            {!auth.token && (
+              <Btn primary lg onClick={login}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2 L20 7 V17 L12 22 L4 17 V7 Z" /><circle cx="12" cy="12" r="3" /></svg>
+                Log in with EVE SSO
+              </Btn>
+            )}
+            <Btn lg onClick={() => navigate('/search/corps')}>
+              {auth.token ? 'Browse corps' : 'Browse corps as guest'}
             </Btn>
-          )}
-          <Btn lg onClick={() => navigate('/search/corps')}>
-            {auth.token ? 'Browse corps' : 'Browse corps as guest'}
-          </Btn>
+          </div>
+          <div style={{ marginTop: 18, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
+            // we pull ESI character + skill + corp history scopes only. read-only. you can revoke any time.
+          </div>
         </div>
-        <div style={{ marginTop: 18, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
-          // we pull ESI character + skill + corp history scopes only. read-only. you can revoke any time.
+        <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-soft)', borderRadius: 'var(--radius-lg)', padding: '28px 28px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+            <span style={{ color: 'var(--text-dim)' }}>You are a</span>
+            {(['pilot', 'corp'] as const).map(r => (
+              <button
+                key={r}
+                onClick={() => setRole(r)}
+                style={{
+                  background: role === r ? 'var(--accent)' : 'transparent',
+                  color: role === r ? 'var(--accent-text-on)' : 'var(--text-dim)',
+                  border: '1px solid',
+                  borderColor: role === r ? 'var(--accent)' : 'var(--border-soft)',
+                  borderRadius: 4,
+                  padding: '2px 10px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          {role === 'pilot' ? (
+            <OnboardCard
+              accentBody
+              body="Your next corp is one login away."
+              steps={[
+                'Sign in with EVE SSO',
+                'Your profile builds itself',
+                'Make it yours',
+                'Find your people',
+              ]}
+            />
+          ) : (
+            <OnboardCard
+              accentBody
+              body="The right pilot exists. Go find them."
+              steps={[
+                'Put your corp on the map',
+                'Set your standards',
+                'Own your listing',
+                'Browse pilots who are ready',
+              ]}
+            />
+          )}
         </div>
       </section>
 
@@ -79,6 +133,23 @@ export default function LandingScreen() {
       <div style={{ marginTop: 80, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
         // independent third-party. not affiliated with ccp games. fly safe — but mostly fly dangerous.
       </div>
+    </div>
+  );
+}
+
+function OnboardCard({ label, body, accentBody, steps }: { label?: string; body?: string; accentBody?: boolean; steps: string[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {label && <div className="eyebrow accent" style={{ fontSize: 11 }}>{label}</div>}
+      {body && <p style={{ margin: 0, fontSize: accentBody ? 26 : 13, fontWeight: accentBody ? 600 : undefined, color: accentBody ? 'var(--accent-text)' : 'var(--text-mid)', lineHeight: accentBody ? 1.2 : 1.55 }}>{body}</p>}
+      <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {steps.map((step, i) => (
+          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, color: 'var(--accent-text)', minWidth: 28, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
+            <span style={{ fontSize: 15, color: 'var(--text-mid)', lineHeight: 1.4 }}>{step}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
