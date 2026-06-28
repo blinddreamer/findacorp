@@ -372,10 +372,6 @@ textarea.input { padding: 12px; height: auto; min-height: 120px; font-family: va
 .skill-cell .dots span { width: 6px; height: 6px; border-radius: 999px; background: oklch(0.30 0.012 250); }
 .skill-cell .dots span.on { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
-/* Doctrine chip */
-.doctrine { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; background: var(--bg-base); border: 1px solid var(--border-soft); border-radius: var(--radius); font-size: 13px; }
-.doctrine .swatch { width: 22px; height: 22px; border-radius: 3px; background: var(--bg-elev); border: 1px solid var(--border); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; color: var(--text-mute); }
-
 /* Corp history timeline */
 .history-row { display: grid; grid-template-columns: 80px 24px 1fr auto; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border-soft); font-size: 13px; }
 .history-row:last-child { border: 0; }

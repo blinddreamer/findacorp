@@ -35,7 +35,6 @@ export default function CorpListingScreen() {
   const [draftLanguages, setDraftLanguages] = useState<string[]>([]);
   const [draftTzHours, setDraftTzHours] = useState<number[]>([]);
   const [draftRequirements, setDraftRequirements] = useState('');
-  const [draftDoctrines, setDraftDoctrines] = useState('');
   const [draftHrIds, setDraftHrIds] = useState<number[]>([]);
 
   const { data: c, isLoading, isError } = useQuery({
@@ -83,7 +82,6 @@ export default function CorpListingScreen() {
     setDraftLanguages(c.languages ?? []);
     setDraftTzHours(c.tzHours ?? []);
     setDraftRequirements((c.requirements ?? []).join('\n'));
-    setDraftDoctrines((c.doctrines ?? []).join('\n'));
     setDraftHrIds(c.hrIds ?? []);
     setIsEditing(true);
   }
@@ -101,7 +99,6 @@ export default function CorpListingScreen() {
         languages: draftLanguages,
         tzHours: draftTzHours,
         requirements: draftRequirements.split('\n').map(s => s.trim()).filter(Boolean),
-        doctrines: draftDoctrines.split('\n').map(s => s.trim()).filter(Boolean),
         // Only the CEO may change the HR roster.
         ...(isCeo ? { hrIds: draftHrIds } : {}),
       });
@@ -187,11 +184,6 @@ export default function CorpListingScreen() {
             )}
           </div>
           {!isEditing && c.tagline && <p className="bio">{c.tagline}</p>}
-          {!isEditing && (c.doctrines?.length ?? 0) > 0 && (
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 14 }}>
-              {c.doctrines!.map(x => <Pill key={x} kind="accent">{x}</Pill>)}
-            </div>
-          )}
         </div>
         <div className="actions">
           {!isEditable && !isMember && (
@@ -227,7 +219,6 @@ export default function CorpListingScreen() {
           draftLanguages={draftLanguages} onLanguagesChange={setDraftLanguages}
           draftTzHours={draftTzHours} onTzHoursChange={setDraftTzHours}
           draftRequirements={draftRequirements} onRequirementsChange={setDraftRequirements}
-          draftDoctrines={draftDoctrines} onDoctrinesChange={setDraftDoctrines}
         />
       )}
       {tab === 'members' && <CorpMembers c={c} />}

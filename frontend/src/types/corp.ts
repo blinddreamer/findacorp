@@ -30,7 +30,6 @@ export interface CorpProfile {
   tagline?: string;
   pitch?: string;
   requirements?: string[];
-  doctrines?: string[];
   content?: string[];
   rolesLooking?: string[];
   languages?: string[];

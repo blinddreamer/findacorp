@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS corps (
     tagline       VARCHAR(500),
     pitch         TEXT,
     requirements  JSON,
-    doctrines     JSON,
     content       JSON,
     roles_looking JSON,
     languages     JSON,

@@ -87,7 +87,7 @@ class CorpServiceTest {
 
     /** Update request that only sets the HR roster (all other fields left null/unchanged). */
     private UpdateCorpRequest hrRequest(List<Long> hrIds) {
-        return new UpdateCorpRequest(null, null, null, null, null, null, null, null,
+        return new UpdateCorpRequest(null, null, null, null, null, null, null,
             null, null, null, null, hrIds);
     }
 

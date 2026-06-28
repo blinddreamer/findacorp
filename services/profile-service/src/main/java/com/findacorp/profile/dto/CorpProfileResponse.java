@@ -19,7 +19,6 @@ public record CorpProfileResponse(
     String tagline,
     String pitch,
     List<String> requirements,
-    List<String> doctrines,
     List<String> content,
     Corp.CorpStatus status,
     List<String> rolesLooking,
@@ -57,7 +56,7 @@ public record CorpProfileResponse(
         return new CorpProfileResponse(
             corp.getCorpId(), corp.getName(), corp.getTicker(), corp.getFaction(),
             corp.getTagline(), corp.getPitch(), corp.getRequirements(),
-            corp.getDoctrines(), corp.getContent(), corp.getStatus(),
+            corp.getContent(), corp.getStatus(),
             corp.getRolesLooking(), corp.getLanguages(), corp.getTzHours(),
             corp.getHrIds(), corp.getUpdatedAt(),
             enriched != null ? enriched.getMembers() : null,

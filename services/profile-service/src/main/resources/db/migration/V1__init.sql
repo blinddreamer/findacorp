@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS corps (
     tagline      VARCHAR(500),
     pitch        TEXT,
     requirements JSON,
-    doctrines    JSON,
     content      JSON,
     status       ENUM('open','selective','closed') DEFAULT 'open',
     updated_at   DATETIME DEFAULT NOW() ON UPDATE NOW()

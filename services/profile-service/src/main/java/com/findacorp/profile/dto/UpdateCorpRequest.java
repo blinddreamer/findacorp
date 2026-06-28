@@ -11,7 +11,6 @@ public record UpdateCorpRequest(
     String tagline,
     String pitch,
     List<String> requirements,
-    List<String> doctrines,
     List<String> content,
     Corp.CorpStatus status,
     List<String> rolesLooking,

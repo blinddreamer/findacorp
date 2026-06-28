@@ -41,10 +41,6 @@ public class Corp {
 
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = "JSON")
-    private List<String> doctrines = new ArrayList<>();
-
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = "JSON")
     private List<String> content = new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)

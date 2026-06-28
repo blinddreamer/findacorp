@@ -28,7 +28,6 @@ export interface UpdateCorpRequest {
   tagline?: string;
   pitch?: string;
   requirements?: string[];
-  doctrines?: string[];
   content?: string[];
   status?: 'open' | 'selective' | 'closed';
   rolesLooking?: string[];

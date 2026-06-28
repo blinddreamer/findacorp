@@ -122,7 +122,6 @@ public class CorpService {
         if (req.tagline() != null)      corp.setTagline(req.tagline());
         if (req.pitch() != null)        corp.setPitch(req.pitch());
         if (req.requirements() != null) corp.setRequirements(req.requirements());
-        if (req.doctrines() != null)    corp.setDoctrines(req.doctrines());
         if (req.content() != null)      corp.setContent(req.content());
         if (req.status() != null)       corp.setStatus(req.status());
         if (req.rolesLooking() != null) corp.setRolesLooking(req.rolesLooking());

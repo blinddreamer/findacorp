@@ -48,7 +48,6 @@ interface OverviewProps {
   draftLanguages: string[]; onLanguagesChange: (v: string[]) => void;
   draftTzHours: number[]; onTzHoursChange: (v: number[]) => void;
   draftRequirements: string; onRequirementsChange: (v: string) => void;
-  draftDoctrines: string; onDoctrinesChange: (v: string) => void;
 }
 
 export default function CorpOverview({
@@ -62,7 +61,6 @@ export default function CorpOverview({
   draftLanguages, onLanguagesChange,
   draftTzHours, onTzHoursChange,
   draftRequirements, onRequirementsChange,
-  draftDoctrines, onDoctrinesChange,
 }: OverviewProps) {
   const corpTzHours = isEditing ? draftTzHours : (c.tzHours ?? []);
   const minSp = findMinSp(c.requirements);
@@ -346,26 +344,6 @@ export default function CorpOverview({
             ) : (
               <div className="muted" style={{ fontSize: 13 }}>
                 {isCeo ? 'No HR appointed yet — click Edit listing to appoint corp members.' : 'No HR appointed.'}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Doctrines */}
-        {(isEditing || (c.doctrines?.length ?? 0) > 0) && (
-          <div className="card">
-            <div className="section-head"><h3>Doctrines</h3><span className="label">/ ship fits</span></div>
-            {isEditing ? (
-              <textarea
-                className="input"
-                placeholder={"One doctrine per line:\nHellcat\nNaglfar fleet\nRoach"}
-                value={draftDoctrines}
-                onChange={e => onDoctrinesChange(e.target.value)}
-                style={{ minHeight: 80, fontSize: 13, resize: 'vertical', width: '100%' }}
-              />
-            ) : (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {c.doctrines!.map(x => <Pill key={x} kind="accent">{x}</Pill>)}
               </div>
             )}
           </div>
