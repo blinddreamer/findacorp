@@ -44,25 +44,25 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div className="card">
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 32, alignItems: 'start' }}>
-          <div>
-            <div className="section-head" style={{ marginBottom: 16 }}><h3>Lifetime stats</h3><span className="label">/ zkillboard</span></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {p.kbKills != null && <Stat label="Kills" value={p.kbKills.toLocaleString()} accent />}
-              {p.kbLosses != null && <Stat label="Losses" value={p.kbLosses.toLocaleString()} />}
-              {p.kbEfficiency != null && <Stat label="Efficiency" value={`${Number(p.kbEfficiency).toFixed(1)}%`} accent />}
-              {p.iskDestroyed != null && <Stat label="ISK destroyed" value={fmtISK(p.iskDestroyed)} />}
-            </div>
-            {p.kbKills == null && <div className="muted" style={{ padding: '16px 0' }}>Kill data not yet synced.</div>}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        <div className="card">
+          <div className="section-head" style={{ marginBottom: 16 }}><h3>Lifetime stats</h3><span className="label">/ zkillboard</span></div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {p.kbKills != null && <Stat label="Kills" value={p.kbKills.toLocaleString()} accent />}
+            {p.soloKills != null && <Stat label="Solo kills" value={p.soloKills.toLocaleString()} accent />}
+            {p.kbLosses != null && <Stat label="Losses" value={p.kbLosses.toLocaleString()} />}
+            {p.kbEfficiency != null && <Stat label="Efficiency" value={`${Number(p.kbEfficiency).toFixed(1)}%`} accent />}
+            {p.iskDestroyed != null && <Stat label="ISK destroyed" value={fmtISK(p.iskDestroyed)} />}
+            {p.iskLost != null && <Stat label="ISK lost" value={fmtISK(p.iskLost)} />}
           </div>
-          {p.heatmap && (
-            <div>
-              <div className="section-head" style={{ marginBottom: 16 }}><h3>Kill activity by hour</h3><span className="label">/ last 7 days</span></div>
-              <KillHeatmap grid={p.heatmap} />
-            </div>
-          )}
+          {p.kbKills == null && <div className="muted" style={{ padding: '16px 0' }}>Kill data not yet synced.</div>}
         </div>
+        {p.heatmap && (
+          <div className="card">
+            <div className="section-head" style={{ marginBottom: 16, width: '100%' }}><h3>Kill activity by hour</h3><span className="label">/ last 7 days</span></div>
+            <KillHeatmap grid={p.heatmap} />
+          </div>
+        )}
       </div>
       {topShips.length > 0 && (
         <div className="card">

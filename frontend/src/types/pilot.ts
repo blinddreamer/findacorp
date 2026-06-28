@@ -57,8 +57,10 @@ export interface PilotProfile {
   lang?: string[];
   kbKills?: number;
   kbLosses?: number;
+  soloKills?: number;
   kbEfficiency?: number;
   iskDestroyed?: number;
+  iskLost?: number;
   heatmap?: number[][];
   lastSyncedAt?: string;
   skills?: SkillDto[];

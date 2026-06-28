@@ -51,11 +51,17 @@ public class PilotEnriched {
     @Column(name = "kb_losses")
     private Integer kbLosses;
 
+    @Column(name = "solo_kills")
+    private Integer soloKills;
+
     @Column(name = "kb_efficiency", precision = 5, scale = 2)
     private BigDecimal kbEfficiency;
 
     @Column(name = "isk_destroyed")
     private Long iskDestroyed;
+
+    @Column(name = "isk_lost")
+    private Long iskLost;
 
     @Convert(converter = IntMatrixConverter.class)
     @Column(columnDefinition = "JSON")

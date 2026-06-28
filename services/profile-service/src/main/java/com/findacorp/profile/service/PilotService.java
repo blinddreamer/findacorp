@@ -117,9 +117,11 @@ public class PilotService {
         enriched.setLang(event.lang());
         enriched.setKbKills(event.kbKills());
         enriched.setKbLosses(event.kbLosses());
+        enriched.setSoloKills(event.soloKills());
         enriched.setKbEfficiency(event.kbEfficiency() != null
             ? BigDecimal.valueOf(event.kbEfficiency()) : null);
         enriched.setIskDestroyed(event.iskDestroyed());
+        enriched.setIskLost(event.iskLost());
         enriched.setHeatmap(event.heatmap());
         // skill queue: store as "SkillName:level" strings
         if (event.skillQueue() != null) {

@@ -202,13 +202,13 @@ export default function PilotProfileScreen() {
           {p.title ? (
             <>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: -40 }}>
                   {p.title}
                 </div>
               </div>
-              <div className="ticker">{p.ticker} {p.corp}</div>
+              <div className="ticker">{p.corpHistory?.find(h => !h.toDate)?.corpName}</div>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <h1 style={{ marginTop: 0 }}>{p.name ?? `Pilot #${p.characterId}`}</h1>
+                <h1 style={{ marginTop: -45 }}>{p.name ?? `Pilot #${p.characterId}`}</h1>
                 <div className="meta">
                   {displayTz && <span><Pill kind="good"><span className="dot" />{displayTz} prime</Pill></span>}
                   {p.sp != null && <span className="mono">{fmtSP(p.sp)} SP</span>}
@@ -220,7 +220,7 @@ export default function PilotProfileScreen() {
             </>
           ) : (
             <>
-              <div className="ticker">{p.ticker} {p.corp}</div>
+              <div className="ticker">{p.corpHistory?.find(h => !h.toDate)?.corpName}</div>
               <h1>{p.name ?? `Pilot #${p.characterId}`}</h1>
               <div className="meta">
                 {displayTz && <span><Pill kind="good"><span className="dot" />{displayTz} prime</Pill></span>}
@@ -241,12 +241,6 @@ export default function PilotProfileScreen() {
             />
           ) : (
             p.bio && <p className="bio">{p.bio}</p>
-          )}
-          {p.lookingFor && (
-            <div className="lookingfor">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-              <span><b>Looking for:</b> {p.lookingFor}</span>
-            </div>
           )}
         </div>
         <div className="actions">
