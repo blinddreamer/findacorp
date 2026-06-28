@@ -33,8 +33,10 @@ public record PilotProfileResponse(
     List<String> lang,
     Integer kbKills,
     Integer kbLosses,
+    Integer soloKills,
     BigDecimal kbEfficiency,
     Long iskDestroyed,
+    Long iskLost,
     int[][] heatmap,
     LocalDateTime lastSyncedAt,
     // detail lists
@@ -101,7 +103,7 @@ public record PilotProfileResponse(
                 pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
                 pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
                 null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null,
                 skillEntries, List.of(), recentSkillEntries, killEntries, historyEntries
             );
         }
@@ -114,8 +116,8 @@ public record PilotProfileResponse(
             pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
             enriched.getTitle(), enriched.getEveBio(), enriched.getSp(), enriched.getSpByCat(), enriched.getTz(),
             enriched.getTzActive(), enriched.getTzPeak(), enriched.getLang(),
-            enriched.getKbKills(), enriched.getKbLosses(), enriched.getKbEfficiency(),
-            enriched.getIskDestroyed(), enriched.getHeatmap(), enriched.getLastSyncedAt(),
+            enriched.getKbKills(), enriched.getKbLosses(), enriched.getSoloKills(), enriched.getKbEfficiency(),
+            enriched.getIskDestroyed(), enriched.getIskLost(), enriched.getHeatmap(), enriched.getLastSyncedAt(),
             skillEntries, queueEntries, recentSkillEntries, killEntries, historyEntries
         );
     }

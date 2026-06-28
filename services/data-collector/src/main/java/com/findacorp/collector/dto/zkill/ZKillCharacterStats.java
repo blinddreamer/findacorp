@@ -7,6 +7,7 @@ public class ZKillCharacterStats {
 
     private Integer shipsDestroyed;
     private Integer shipsLost;
+    private Integer soloKills;
     private Long iskDestroyed;
     private Long iskLost;
 }

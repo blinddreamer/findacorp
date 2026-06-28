@@ -79,6 +79,13 @@ public class PilotEnrichmentService {
                 .filter(k -> k.getZkb() != null && k.getZkb().getTotalValue() != null)
                 .mapToLong(k -> k.getZkb().getTotalValue().longValue())
                 .sum();
+        Integer soloKills = zkStats != null ? zkStats.getSoloKills() : null;
+        long iskLost = zkStats != null && zkStats.getIskLost() != null
+            ? zkStats.getIskLost()
+            : losses.stream()
+                .filter(k -> k.getZkb() != null && k.getZkb().getTotalValue() != null)
+                .mapToLong(k -> k.getZkb().getTotalValue().longValue())
+                .sum();
 
         // Fetch full killmail details from ESI (victim/attacker/time/system)
         List<EsiKillmailEntry> killDetails = fetchKillmailDetails(
@@ -113,7 +120,7 @@ public class PilotEnrichmentService {
         return new PilotEnrichedEvent(
             characterId, name, title, eveBio, totalSp, spByCat(skillsResp),
             tz, tzActive, tzPeak, List.of("en"),
-            kbKills, kbLosses, kbEfficiency, iskDestroyed,
+            kbKills, kbLosses, soloKills, kbEfficiency, iskDestroyed, iskLost,
             heatmap, skillDtos, skillQueue, killHistory, corpHistory,
             Instant.now()
         );
