@@ -103,7 +103,7 @@ public record PilotProfileResponse(
                 pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
                 pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
                 null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null,
                 skillEntries, List.of(), recentSkillEntries, killEntries, historyEntries
             );
         }
