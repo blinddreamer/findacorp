@@ -21,7 +21,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
     return Array.from(counts.entries())
       .map(([ship, { kills, losses, typeId }]) => ({ ship, kills, losses, typeId, total: kills + losses }))
       .sort((a, b) => b.total - a.total)
-      .slice(0, 6);
+      .slice(0, 12);
   }, [p.killHistory]);
 
   useEffect(() => {
@@ -65,21 +65,21 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
       {topShips.length > 0 && (
         <div className="card" style={{ gridColumn: '1 / -1' }}>
           <div className="section-head"><h3>Top ships flown</h3><span className="label">/ from kill history</span></div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 12 }}>
             {topShips.map(({ ship, kills, losses, typeId }) => {
               const effectiveTypeId = typeId ?? resolvedTypeIds[ship];
               return (
               <div key={ship} className="skill-cell" style={{ alignItems: 'center' }}>
-                <div style={{ width: '100%', aspectRatio: '1', background: 'var(--bg-elev)', borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
+                <div style={{ width: 64, height: 64, background: 'var(--bg-elev)', borderRadius: 4, overflow: 'hidden', marginBottom: 8, flexShrink: 0 }}>
                   {effectiveTypeId ? (
                     <img
-                      src={`https://images.evetech.net/types/${effectiveTypeId}/render?size=128`}
+                      src={`https://images.evetech.net/types/${effectiveTypeId}/render?size=64`}
                       alt={ship}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      style={{ width: 64, height: 64, objectFit: 'cover', display: 'block' }}
                       onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center' }}>
+                    <div style={{ width: 64, height: 64, display: 'grid', placeItems: 'center' }}>
                       <svg width="40%" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.7">
                         <path d="M12 2 L20 8 L17 22 L7 22 L4 8 Z" />
                       </svg>
