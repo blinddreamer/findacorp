@@ -294,7 +294,8 @@ public class PilotEnrichmentService {
         try {
             Instant instant = Instant.parse(killmailTime);
             LocalDateTime dt = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-            int day = dt.getDayOfWeek().getValue() % 7;
+            // Row 0 = Monday … row 6 = Sunday, matching the frontend KillHeatmap labels.
+            int day = dt.getDayOfWeek().getValue() - 1;
             int hour = dt.getHour();
             heatmap[day][hour]++;
         } catch (Exception e) {
