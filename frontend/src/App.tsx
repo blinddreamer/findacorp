@@ -139,7 +139,7 @@ function TopNav({ auth }: { auth: NavAuth }) {
             </Btn>
           </div>
         ) : (
-          <Btn sm primary onClick={() => { window.location.href = '/auth/login'; }}>
+          <Btn sm primary onClick={() => { window.location.href = '/api/auth/login'; }}>
             Log in with EVE SSO
           </Btn>
         )}

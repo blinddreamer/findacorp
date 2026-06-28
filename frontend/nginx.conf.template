@@ -7,13 +7,17 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # SPA: fall back to index.html so client-side routes (e.g. /pilots/123) resolve.
+    # SPA: fall back to index.html so client-side routes (e.g. /pilots/123,
+    # /search/corps, /inbox) resolve on a hard refresh instead of hitting the API.
     location / {
         try_files $uri $uri/ /index.html;
     }
 
-    # Proxy API calls to the FINDACORP api-gateway. Mirrors the Vite dev proxy paths.
-    location ~ ^/(auth|profiles|search|inbox)(/|$) {
+    # Proxy API calls to the FINDACORP api-gateway. Everything the SPA calls is under
+    # /api/* (see axiosClient baseURL); we strip that prefix so the gateway keeps its
+    # existing /auth, /profiles, /search, /inbox routes. Mirrors the Vite dev proxy.
+    location /api/ {
+        rewrite ^/api/(.*)$ /$1 break;
         proxy_pass ${GATEWAY_URL};
         proxy_http_version 1.1;
         proxy_set_header Host $host;

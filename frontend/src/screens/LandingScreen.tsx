@@ -8,7 +8,7 @@ export default function LandingScreen() {
   const auth = useAuth();
 
   function login() {
-    window.location.href = '/auth/login';
+    window.location.href = '/api/auth/login';
   }
 
   return (
