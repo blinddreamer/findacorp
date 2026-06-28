@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCorp, updateCorp, getPilot } from '../api/profileApi';
 import { useAuth } from '../auth/useAuth';
 import CorpLogo from '../components/CorpLogo';
 import Pill from '../components/Pill';
 import Btn from '../components/Btn';
+import VisibilityToggle from '../components/VisibilityToggle';
 import ApplicationModal from './ApplicationModal';
 import CorpOverview from './corp/CorpOverview';
 import CorpMembers from './corp/CorpMembers';
@@ -14,10 +15,17 @@ import CorpHistory from './corp/CorpHistory';
 import { inferTz } from '../utils/tz';
 import { CORP_EDIT_RESTRICTED } from '../config';
 
+/** A listing fetch fails with 403/404 when it's private (or absent) — bounce viewers home. */
+function isHiddenError(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } } | null)?.response?.status;
+  return status === 403 || status === 404;
+}
+
 export default function CorpListingScreen() {
   const { corpId } = useParams<{ corpId: string }>();
   const id = Number(corpId);
   const auth = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [tab, setTab] = useState('overview');
@@ -36,13 +44,20 @@ export default function CorpListingScreen() {
   const [draftTzHours, setDraftTzHours] = useState<number[]>([]);
   const [draftRequirements, setDraftRequirements] = useState('');
   const [draftHrIds, setDraftHrIds] = useState<number[]>([]);
+  const [draftIsPublic, setDraftIsPublic] = useState(true);
 
-  const { data: c, isLoading, isError } = useQuery({
+  const { data: c, isLoading, isError, error } = useQuery({
     queryKey: ['corp', id],
     queryFn: () => getCorp(id),
     staleTime: 5 * 60 * 1000,
     enabled: !!id,
+    retry: false,
   });
+
+  // A private (or missing) listing is hidden from non-CEO/HR viewers — send them home.
+  useEffect(() => {
+    if (isError && isHiddenError(error)) navigate('/', { replace: true });
+  }, [isError, error, navigate]);
 
   useEffect(() => {
     if (c?.name) document.title = `${c.name} · FINDACORP`;
@@ -83,6 +98,7 @@ export default function CorpListingScreen() {
     setDraftTzHours(c.tzHours ?? []);
     setDraftRequirements((c.requirements ?? []).join('\n'));
     setDraftHrIds(c.hrIds ?? []);
+    setDraftIsPublic(c.isPublic ?? true);
     setIsEditing(true);
   }
 
@@ -99,6 +115,7 @@ export default function CorpListingScreen() {
         languages: draftLanguages,
         tzHours: draftTzHours,
         requirements: draftRequirements.split('\n').map(s => s.trim()).filter(Boolean),
+        isPublic: draftIsPublic,
         // Only the CEO may change the HR roster.
         ...(isCeo ? { hrIds: draftHrIds } : {}),
       });
@@ -118,7 +135,11 @@ export default function CorpListingScreen() {
   }
 
   if (isLoading) return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Loading corp profile…</div></div>;
-  if (isError || !c) return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Corp not found or not yet indexed.</div></div>;
+  if (isError || !c) {
+    // Private/missing listings redirect home (effect above); avoid flashing the not-found card.
+    if (isHiddenError(error)) return <div className="page" />;
+    return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Corp not found or not yet indexed.</div></div>;
+  }
 
   const statusKind = c.status === 'open' ? 'good' : c.status === 'selective' ? 'accent' : 'danger';
 
@@ -150,8 +171,9 @@ export default function CorpListingScreen() {
       </div>
 
       {isEditing && (
-        <div style={{ marginBottom: 16, padding: '8px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)', borderRadius: 6, fontSize: 12.5, color: 'var(--accent-text)' }}>
-          // editing corp listing — changes are not saved until you click Save
+        <div style={{ marginBottom: 16, padding: '10px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 12.5, color: 'var(--accent-text)' }}>// editing corp listing — changes are not saved until you click Save</span>
+          <VisibilityToggle isPublic={draftIsPublic} onChange={setDraftIsPublic} label="Listing" />
         </div>
       )}
 
@@ -176,6 +198,7 @@ export default function CorpListingScreen() {
           <h1>{c.name ?? `Corp #${c.corpId}`}</h1>
           <div className="meta">
             {c.status && <Pill kind={statusKind}><span className="dot" />Recruitment {c.status}</Pill>}
+            {!isEditing && c.isPublic === false && <Pill kind="danger"><span className="dot" />Private</Pill>}
             {c.members != null && (
               <span className="mono">{c.members}{c.capacity != null ? ` / ${c.capacity}` : ''} members</span>
             )}

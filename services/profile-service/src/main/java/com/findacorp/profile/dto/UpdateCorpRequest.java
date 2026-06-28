@@ -16,5 +16,6 @@ public record UpdateCorpRequest(
     List<String> rolesLooking,
     List<String> languages,
     List<Integer> tzHours,
-    List<Long> hrIds
+    List<Long> hrIds,
+    Boolean isPublic
 ) {}

@@ -15,8 +15,10 @@ public class PilotController {
     private final PilotService pilotService;
 
     @GetMapping("/pilot/{characterId}")
-    public ResponseEntity<PilotProfileResponse> getProfile(@PathVariable("characterId") Long characterId) {
-        return ResponseEntity.ok(pilotService.getProfile(characterId));
+    public ResponseEntity<PilotProfileResponse> getProfile(
+            @PathVariable("characterId") Long characterId,
+            @RequestHeader(value = "X-Character-Id", required = false) Long requesterId) {
+        return ResponseEntity.ok(pilotService.getProfile(characterId, requesterId));
     }
 
     @DeleteMapping("/pilot/{characterId}")

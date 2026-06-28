@@ -21,6 +21,7 @@ public record PilotProfileResponse(
     Boolean verified,
     List<Integer> manualTzActive,
     List<String> languages,
+    Boolean isPublic,
     // enriched fields (nullable)
     Long sp,
     Map<String, Long> spByCat,
@@ -96,7 +97,7 @@ public record PilotProfileResponse(
             return new PilotProfileResponse(
                 pilot.getCharacterId(), pilot.getName(), pilot.getBio(), pilot.getLookingFor(),
                 pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
-                pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(),
+                pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
                 null, null, null, null, null, null,
                 null, null, null, null, null, null,
                 skillEntries, List.of(), recentSkillEntries, killEntries, historyEntries
@@ -108,7 +109,7 @@ public record PilotProfileResponse(
         return new PilotProfileResponse(
             pilot.getCharacterId(), pilot.getName(), pilot.getBio(), pilot.getLookingFor(),
             pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
-            pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(),
+            pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
             enriched.getSp(), enriched.getSpByCat(), enriched.getTz(),
             enriched.getTzActive(), enriched.getTzPeak(), enriched.getLang(),
             enriched.getKbKills(), enriched.getKbLosses(), enriched.getKbEfficiency(),

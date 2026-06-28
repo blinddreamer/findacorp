@@ -96,9 +96,15 @@ public class CorpService {
                 .orElse(null));
     }
 
-    public CorpProfileResponse getProfile(Long corpId) {
+    public CorpProfileResponse getProfile(Long corpId, Long requesterId) {
         Corp corp = corpRepository.findById(corpId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Corp not found"));
+
+        // Private listings are visible only to the CEO or appointed HR; everyone else gets a 404.
+        if (Boolean.FALSE.equals(corp.getIsPublic()) && !canEdit(corpId, requesterId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Corp not found");
+        }
+
         CorpEnriched enriched  = corpEnrichedRepository.findById(corpId).orElse(null);
         var allianceHistory    = allianceHistoryRepository.findByCorpIdOrderByStartDateDesc(corpId);
         var memberHistory      = memberSnapshotRepository.findTop60ByCorpIdOrderBySnappedAtDesc(corpId);
@@ -134,6 +140,7 @@ public class CorpService {
             }
             corp.setHrIds(req.hrIds());
         }
+        if (req.isPublic() != null)     corp.setIsPublic(req.isPublic());
 
         // Keep the denormalized, search-queryable derivations in sync with the raw fields.
         corp.setTz(CorpDerived.inferTz(corp.getTzHours()));

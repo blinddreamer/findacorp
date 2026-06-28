@@ -26,9 +26,11 @@ export default function LandingScreen() {
               Log in with EVE SSO
             </Btn>
           )}
-          <Btn lg onClick={() => navigate('/search/corps')}>
-            {auth.token ? 'Browse corps' : 'Browse corps as guest'}
-          </Btn>
+          {auth.token && (
+            <Btn lg onClick={() => navigate('/search/corps')}>
+              Browse corps
+            </Btn>
+          )}
         </div>
         <div style={{ marginTop: 18, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
           // we pull ESI character + skill + corp history scopes only. read-only. you can revoke any time.

@@ -59,6 +59,10 @@ public class Corp {
     @Column(name = "hr_ids", columnDefinition = "JSON")
     private List<Long> hrIds = new ArrayList<>();
 
+    /** When false, the listing is hidden from search and direct access (CEO/HR-only). */
+    @Column(name = "is_public")
+    private Boolean isPublic = true;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('open','selective','closed')")
     private CorpStatus status = CorpStatus.open;

@@ -13,8 +13,15 @@ import PilotSkills from './pilot/PilotSkills';
 import PilotKillboard from './pilot/PilotKillboard';
 import PilotHistory from './pilot/PilotHistory';
 import OnboardingModal from './pilot/OnboardingModal';
+import VisibilityToggle from '../components/VisibilityToggle';
 import { fmtSP } from '../utils/format';
 import { inferTz } from '../utils/tz';
+
+/** A profile fetch fails with 403/404 when it's private (or absent) — bounce non-owners home. */
+function isHiddenError(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } } | null)?.response?.status;
+  return status === 403 || status === 404;
+}
 
 export default function PilotProfileScreen() {
   const { characterId } = useParams<{ characterId: string }>();
@@ -38,16 +45,25 @@ export default function PilotProfileScreen() {
   const [draftRoles, setDraftRoles] = useState<string[]>([]);
   const [draftContent, setDraftContent] = useState<string[]>([]);
   const [draftLanguages, setDraftLanguages] = useState<string[]>([]);
+  const [draftIsPublic, setDraftIsPublic] = useState(true);
 
   // Onboarding modal
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const { data: p, isLoading, isError } = useQuery({
+  const { data: p, isLoading, isError, error } = useQuery({
     queryKey: ['pilot', id],
     queryFn: () => getPilot(id),
     staleTime: 5 * 60 * 1000,
     enabled: !!id,
+    retry: false,
   });
+
+  const isOwner = auth.characterId === id;
+
+  // A private (or missing) profile is hidden from everyone but its owner — send them home.
+  useEffect(() => {
+    if (isError && !isOwner && isHiddenError(error)) navigate('/', { replace: true });
+  }, [isError, isOwner, error, navigate]);
 
   useEffect(() => {
     if (p?.name) document.title = `${p.name} · FINDACORP`;
@@ -64,8 +80,6 @@ export default function PilotProfileScreen() {
     }
   }, [isError, id, auth.characterId, queryClient]);
 
-  const isOwner = auth.characterId === id;
-
   useEffect(() => {
     if (!p || !isOwner) return;
     const key = `findacorp_onboarding_done_${id}`;
@@ -77,7 +91,11 @@ export default function PilotProfileScreen() {
   if (isLoading || creatingStub) {
     return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Loading pilot profile…</div></div>;
   }
-  if (isError || !p) return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Pilot not found or not yet indexed.</div></div>;
+  if (isError || !p) {
+    // Non-owners hitting a private (or missing) profile are bounced home by the effect above.
+    if (!isOwner && isHiddenError(error)) return <div className="page" />;
+    return <div className="page"><div className="card" style={{ textAlign: 'center', padding: 40 }}>Pilot not found or not yet indexed.</div></div>;
+  }
 
   function enterEdit() {
     if (!p) return;
@@ -86,6 +104,7 @@ export default function PilotProfileScreen() {
     setDraftRoles(p.roles ?? []);
     setDraftContent(p.content ?? []);
     setDraftLanguages(p.languages ?? []);
+    setDraftIsPublic(p.isPublic ?? true);
     setIsEditing(true);
   }
 
@@ -102,6 +121,7 @@ export default function PilotProfileScreen() {
         roles: draftRoles,
         content: draftContent,
         languages: draftLanguages,
+        isPublic: draftIsPublic,
       });
       await queryClient.invalidateQueries({ queryKey: ['pilot', id] });
       setIsEditing(false);
@@ -168,8 +188,9 @@ export default function PilotProfileScreen() {
       </div>
 
       {isEditing && (
-        <div style={{ marginBottom: 16, padding: '8px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)', borderRadius: 6, fontSize: 12.5, color: 'var(--accent-text)' }}>
-          // editing your profile — changes are not saved until you click Save
+        <div style={{ marginBottom: 16, padding: '10px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 12.5, color: 'var(--accent-text)' }}>// editing your profile — changes are not saved until you click Save</span>
+          <VisibilityToggle isPublic={draftIsPublic} onChange={setDraftIsPublic} label="Profile" />
         </div>
       )}
 
@@ -185,6 +206,7 @@ export default function PilotProfileScreen() {
             {p.sp != null && <span className="mono">{fmtSP(p.sp)} SP</span>}
             {p.activity && <><span className="dim">·</span><span>{p.activity}</span></>}
             {p.verified && <span className="mono" style={{ color: 'var(--good)', fontSize: 11 }}>✓ ESI verified</span>}
+            {!isEditing && p.isPublic === false && <Pill kind="danger"><span className="dot" />Private</Pill>}
           </div>
           {isEditing ? (
             <textarea

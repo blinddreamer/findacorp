@@ -35,6 +35,7 @@ export interface CorpProfile {
   languages?: string[];
   tzHours?: number[];
   hrIds?: number[];
+  isPublic?: boolean;
   status?: 'open' | 'selective' | 'closed';
   updatedAt?: string;
   members?: number;

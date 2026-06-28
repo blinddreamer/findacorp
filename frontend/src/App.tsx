@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import BrandMark from './components/BrandMark';
 import Btn from './components/Btn';
 import { useAuth, clearAccessToken } from './auth/useAuth';
-import { useIsRecruiter } from './auth/useIsRecruiter';
+import { useRecruiterStatus } from './auth/useIsRecruiter';
 import { logout } from './api/authApi';
 import { globalSearch, type GlobalSearchResult } from './api/profileApi';
 import { getUnreadCount } from './api/applicationApi';
@@ -79,7 +79,7 @@ function TopNav({ auth }: { auth: NavAuth }) {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const isRecruiter = useIsRecruiter();
+  const { isRecruiter, corpId, hasListing } = useRecruiterStatus();
 
   useEffect(() => {
     const staticTitles: Record<string, string> = {
@@ -102,10 +102,13 @@ function TopNav({ auth }: { auth: NavAuth }) {
 
   const links = [
     { path: '/', label: 'Home' },
-    { path: '/search/corps', label: 'Find a corp' },
+    // Find a corp is for logged-in pilots only.
+    ...(auth.characterId ? [{ path: '/search/corps', label: 'Find a corp' }] : []),
     // HR tool — only a corp's CEO or appointed HR sees it.
     ...(isRecruiter ? [{ path: '/search/pilots', label: 'HR · find pilots' }] : []),
     ...(auth.characterId ? [{ path: `/pilots/${auth.characterId}`, label: 'My profile' }] : []),
+    // Shortcut to the user's corp listing, once it has been published.
+    ...(corpId && hasListing ? [{ path: `/corps/${corpId}`, label: 'My corp' }] : []),
   ];
 
   return (
@@ -126,7 +129,11 @@ function TopNav({ auth }: { auth: NavAuth }) {
         {auth.token ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <InboxButton navigate={navigate} currentPath={currentPath} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px 4px 4px', border: '1px solid var(--border-soft)', borderRadius: 999 }}>
+            <div
+              onClick={() => navigate(`/pilots/${auth.characterId}`)}
+              title="View my profile"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px 4px 4px', border: '1px solid var(--border-soft)', borderRadius: 999, cursor: 'pointer' }}
+            >
               <NavPortrait characterId={auth.characterId} name={auth.characterName} />
               <span style={{ fontSize: 12.5 }}>{auth.characterName}</span>
             </div>

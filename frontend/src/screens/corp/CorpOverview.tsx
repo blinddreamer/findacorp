@@ -3,7 +3,6 @@ import TZRing from '../../components/TZRing';
 import Pill from '../../components/Pill';
 import Stat from '../../components/Stat';
 import TzRangeEditor from '../../components/TzRangeEditor';
-import { fmtSP } from '../../utils/format';
 import { inferTz, hoursRange } from '../../utils/tz';
 import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, MAX_HR } from '../../utils/hr';
 import { parseRequirement, formatRequirement, splitRequirement } from '../../utils/requirements';
@@ -11,27 +10,6 @@ import { parseRequirement, formatRequirement, splitRequirement } from '../../uti
 const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
-
-/** Find a declared minimum-SP requirement, matching on the label before the colon. */
-function findMinSp(requirements?: string[]): number | null {
-  if (!requirements) return null;
-  for (const raw of requirements) {
-    const r = parseRequirement(raw).text;
-    const idx = r.indexOf(':');
-    if (idx === -1) continue;
-    const label = r.slice(0, idx).trim().toLowerCase();
-    const isSp = label.includes('skill') || label.split(/\s+/).includes('sp');
-    if (isSp) {
-      const m = r.slice(idx + 1).replace(/,/g, '').trim().toUpperCase().match(/^([\d.]+)\s*([KMB])?$/);
-      if (m) {
-        const mult = m[2] === 'B' ? 1e9 : m[2] === 'M' ? 1e6 : m[2] === 'K' ? 1e3 : 1;
-        const n = parseFloat(m[1]) * mult;
-        if (Number.isFinite(n) && n > 0) return n;
-      }
-    }
-  }
-  return null;
-}
 
 interface OverviewProps {
   c: CorpProfile;
@@ -63,7 +41,6 @@ export default function CorpOverview({
   draftRequirements, onRequirementsChange,
 }: OverviewProps) {
   const corpTzHours = isEditing ? draftTzHours : (c.tzHours ?? []);
-  const minSp = findMinSp(c.requirements);
   const overlapHours = pilotTzHours.filter(h => corpTzHours.includes(h));
   const overlapPct = corpTzHours.length > 0 && pilotTzHours.length > 0
     ? Math.round(overlapHours.length / corpTzHours.length * 100)
@@ -421,15 +398,6 @@ export default function CorpOverview({
           </div>
         )}
 
-        {/* Min SP */}
-        {!isEditing && minSp != null && (
-          <div className="card">
-            <div className="section-head"><h3>Minimum SP</h3></div>
-            <div className="mono" style={{ fontSize: 22, color: 'var(--accent-text)' }}>
-              {fmtSP(minSp)}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

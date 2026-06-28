@@ -88,7 +88,7 @@ class CorpServiceTest {
     /** Update request that only sets the HR roster (all other fields left null/unchanged). */
     private UpdateCorpRequest hrRequest(List<Long> hrIds) {
         return new UpdateCorpRequest(null, null, null, null, null, null, null,
-            null, null, null, null, hrIds);
+            null, null, null, null, hrIds, null);
     }
 
     @Test
@@ -106,6 +106,35 @@ class CorpServiceTest {
         var resp = corpService.upsertCorp(1L, hrRequest(List.of(200L, 201L)));
 
         assertThat(resp.hrIds()).containsExactly(200L, 201L);
+    }
+
+    // ── getProfile: private-listing visibility ────────────────────────────────
+
+    private Corp privateCorp(long corpId) {
+        Corp c = new Corp();
+        c.setCorpId(corpId);
+        c.setIsPublic(false);
+        return c;
+    }
+
+    @Test
+    void getProfile_privateCorp_hiddenFromNonCeoHr() {
+        when(corpRepository.findById(1L)).thenReturn(Optional.of(privateCorp(1L)));
+        when(corpEnrichedRepository.findById(1L)).thenReturn(Optional.of(enrichedWithCeo(1L, 100L)));
+        assertThatThrownBy(() -> corpService.getProfile(1L, 999L))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void getProfile_privateCorp_visibleToCeo() {
+        when(corpRepository.findById(1L)).thenReturn(Optional.of(privateCorp(1L)));
+        when(corpEnrichedRepository.findById(1L)).thenReturn(Optional.of(enrichedWithCeo(1L, 100L)));
+
+        var resp = corpService.getProfile(1L, 100L);
+
+        assertThat(resp.corpId()).isEqualTo(1L);
+        assertThat(resp.isPublic()).isFalse();
     }
 
     // ── isRecruiter: CEO/HR of the caller's current corp ──────────────────────
