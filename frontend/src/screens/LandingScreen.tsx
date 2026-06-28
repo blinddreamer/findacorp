@@ -26,15 +26,14 @@ export default function LandingScreen() {
             Real profiles from ESI and zKill. Corps search by timezone and content — not a wall of forum threads.
           </p>
           <div className="ctas">
-            {!auth.token && (
+            {auth.token ? (
+              <Btn primary lg onClick={() => navigate('/search/corps')}>Browse corps</Btn>
+            ) : (
               <Btn primary lg onClick={login}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2 L20 7 V17 L12 22 L4 17 V7 Z" /><circle cx="12" cy="12" r="3" /></svg>
                 Log in with EVE SSO
               </Btn>
             )}
-            <Btn lg onClick={() => navigate('/search/corps')}>
-              {auth.token ? 'Browse corps' : 'Browse corps as guest'}
-            </Btn>
           </div>
           <div style={{ marginTop: 18, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
             // ESI character + skill + corp history scopes only. read-only. revoke any time.
@@ -174,15 +173,15 @@ export default function LandingScreen() {
               Log in with EVE SSO
             </Btn>
           )}
-          <Btn lg onClick={() => navigate('/search/corps')}>
-            {auth.token ? 'Browse corps' : 'Browse as guest'}
-          </Btn>
+          {auth.token && (
+            <Btn lg onClick={() => navigate('/search/corps')}>Browse corps</Btn>
+          )}
         </div>
       </div>
 
       {/* ── Footer note ── */}
       <div style={{ marginTop: 48, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)' }}>
-        // independent third-party. not affiliated with ccp games. fly safe — but mostly fly dangerous.
+        // independent third-party. not affiliated with <a href="https://fenris.com/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'underline', textUnderlineOffset: 3 }}>fenris creations</a>. fly safe — but mostly fly dangerous.
       </div>
     </div>
   );
