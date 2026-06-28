@@ -158,3 +158,5 @@ CREATE INDEX IF NOT EXISTS idx_corps_status ON corps (status);
 CREATE INDEX IF NOT EXISTS idx_corps_tz     ON corps (tz);
 CREATE INDEX IF NOT EXISTS idx_pe_sp        ON pilot_enriched (sp);
 CREATE INDEX IF NOT EXISTS idx_pe_tz        ON pilot_enriched (tz);
+ALTER TABLE pilot_enriched ADD COLUMN IF NOT EXISTS title   VARCHAR(255) NULL;
+ALTER TABLE pilot_enriched ADD COLUMN IF NOT EXISTS eve_bio TEXT         NULL;
