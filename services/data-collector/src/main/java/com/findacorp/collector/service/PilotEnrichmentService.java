@@ -1,5 +1,6 @@
 package com.findacorp.collector.service;
 
+import com.findacorp.collector.dto.esi.EsiCharacterInfo;
 import com.findacorp.collector.dto.esi.EsiCorpHistoryEntry;
 import com.findacorp.collector.dto.esi.EsiCorpInfo;
 import com.findacorp.collector.dto.esi.EsiGroupInfo;
@@ -49,8 +50,11 @@ public class PilotEnrichmentService {
     public PilotEnrichedEvent enrich(Long characterId) {
         String bearer = "Bearer " + authClient.getEveAccessToken(characterId);
 
-        // Pilot's own character name — refreshed each sync so renames propagate
-        String name = nameCache.getCharacterName(characterId);
+        // Pilot's own character info — refreshed each sync so renames and title changes propagate
+        EsiCharacterInfo charInfo = esiClient.getCharacterInfo(characterId);
+        String name = charInfo.getName() != null ? charInfo.getName() : nameCache.getCharacterName(characterId);
+        String title = charInfo.getTitle() != null && !charInfo.getTitle().isBlank() ? charInfo.getTitle() : null;
+        String eveBio = charInfo.getDescription() != null && !charInfo.getDescription().isBlank() ? charInfo.getDescription() : null;
 
         EsiSkillsResponse skillsResp = esiClient.getSkills(characterId, bearer);
         List<EsiCorpHistoryEntry> rawHistory = esiClient.getCorpHistory(characterId);
@@ -107,7 +111,7 @@ public class PilotEnrichmentService {
         Long totalSp = skillsResp.getTotalSp() != null ? skillsResp.getTotalSp() : 0L;
 
         return new PilotEnrichedEvent(
-            characterId, name, totalSp, spByCat(skillsResp),
+            characterId, name, title, eveBio, totalSp, spByCat(skillsResp),
             tz, tzActive, tzPeak, List.of("en"),
             kbKills, kbLosses, kbEfficiency, iskDestroyed,
             heatmap, skillDtos, skillQueue, killHistory, corpHistory,

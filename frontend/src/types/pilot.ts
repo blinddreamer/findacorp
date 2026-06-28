@@ -36,7 +36,9 @@ export interface PilotProfile {
   name?: string;
   ticker?: string;
   corp?: string;
+  title?: string;
   bio?: string;
+  eveBio?: string;
   lookingFor?: string;
   roles?: string[];
   content?: string[];

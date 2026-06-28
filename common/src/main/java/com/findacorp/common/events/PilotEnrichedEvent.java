@@ -11,6 +11,8 @@ import java.util.Map;
 public record PilotEnrichedEvent(
         Long characterId,
         String name,
+        String title,
+        String eveBio,
         Long sp,
         Map<String, Long> spByCat,
         String tz,

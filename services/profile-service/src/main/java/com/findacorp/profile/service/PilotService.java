@@ -127,6 +127,8 @@ public class PilotService {
                 .map(s -> s.skillName() + ":" + s.level())
                 .toList());
         }
+        enriched.setTitle(event.title());
+        enriched.setEveBio(event.eveBio());
         enriched.setLastSyncedAt(toLocalDateTime(event.syncedAt()));
         pilotEnrichedRepository.save(enriched);
 

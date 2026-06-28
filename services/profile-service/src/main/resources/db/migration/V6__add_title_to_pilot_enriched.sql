@@ -1,0 +1,1 @@
+ALTER TABLE pilot_enriched ADD COLUMN title VARCHAR(255) NULL;

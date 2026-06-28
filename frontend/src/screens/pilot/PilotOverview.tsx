@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { PilotProfile } from '../../types/pilot';
 import TZRing from '../../components/TZRing';
 import Pill from '../../components/Pill';
@@ -22,7 +23,17 @@ interface OverviewProps {
   onLanguagesChange: (l: string[]) => void;
 }
 
+const EVE_BIO_CLAMP_LINES = 4;
+// ~80 chars per line * 4 lines; also clamp if there are more than 4 explicit newlines
+const EVE_BIO_CLAMP_THRESHOLD = 320;
+
+function eveBioNeedsClamp(bio: string): boolean {
+  return bio.length > EVE_BIO_CLAMP_THRESHOLD || (bio.match(/\n/g)?.length ?? 0) >= EVE_BIO_CLAMP_LINES;
+}
+
 export default function PilotOverview({ p, isOwner, isEditing, draftTzHours, onTzChange, draftRoles, onRolesChange, draftContent, onContentChange, draftLanguages, onLanguagesChange }: OverviewProps) {
+  const [eveBioExpanded, setEveBioExpanded] = useState(false);
+  const bioIsLong = !!p.eveBio && eveBioNeedsClamp(p.eveBio);
   const hasManualHours = (p.manualTzActive?.length ?? 0) > 0;
 
   // Effective timezone label — mirrors the hero pill logic
@@ -100,6 +111,48 @@ export default function PilotOverview({ p, isOwner, isEditing, draftTzHours, onT
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {p.eveBio && (
+          <div className="card">
+            <div className="section-head">
+              <h3>In-game bio</h3>
+              <span className="label">/ EVE character sheet</span>
+            </div>
+            <div style={{ position: 'relative' }}>
+              <p style={{
+                fontSize: 13,
+                lineHeight: 1.6,
+                color: 'var(--text-mute)',
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                ...(bioIsLong && !eveBioExpanded ? {
+                  overflow: 'hidden',
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: EVE_BIO_CLAMP_LINES,
+                } : {}),
+              }}>
+                {p.eveBio}
+              </p>
+              {bioIsLong && (
+                <button
+                  onClick={() => setEveBioExpanded(x => !x)}
+                  style={{
+                    marginTop: 8,
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    color: 'var(--accent, #5b9cf6)',
+                  }}
+                >
+                  {eveBioExpanded ? 'Show less' : 'Read more'}
+                </button>
+              )}
+            </div>
           </div>
         )}
 

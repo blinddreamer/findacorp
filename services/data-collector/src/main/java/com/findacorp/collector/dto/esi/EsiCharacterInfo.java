@@ -8,6 +8,10 @@ public class EsiCharacterInfo {
 
     private String name;
 
+    private String title;
+
+    private String description;
+
     @JsonProperty("corporation_id")
     private Long corporationId;
 

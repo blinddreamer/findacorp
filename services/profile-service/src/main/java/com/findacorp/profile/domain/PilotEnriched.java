@@ -65,6 +65,12 @@ public class PilotEnriched {
     @Column(name = "skill_queue", columnDefinition = "JSON")
     private List<String> skillQueue = new ArrayList<>();
 
+    @Column(length = 255)
+    private String title;
+
+    @Column(name = "eve_bio", columnDefinition = "TEXT")
+    private String eveBio;
+
     @Column(name = "last_synced_at")
     private LocalDateTime lastSyncedAt;
 }

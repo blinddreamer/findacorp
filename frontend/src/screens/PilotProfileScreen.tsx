@@ -199,6 +199,11 @@ export default function PilotProfileScreen() {
           <Portrait id={p.characterId} name={p.name} />
         </div>
         <div className="ident">
+          {p.title && (
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--bad, #e05252)', textTransform: 'uppercase', marginBottom: 4 }}>
+              {p.title}
+            </div>
+          )}
           <div className="ticker">{p.ticker} {p.corp}</div>
           <h1>{p.name ?? `Pilot #${p.characterId}`}</h1>
           <div className="meta">

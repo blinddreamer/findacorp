@@ -23,6 +23,8 @@ public record PilotProfileResponse(
     List<String> languages,
     Boolean isPublic,
     // enriched fields (nullable)
+    String title,
+    String eveBio,
     Long sp,
     Map<String, Long> spByCat,
     String tz,
@@ -98,7 +100,7 @@ public record PilotProfileResponse(
                 pilot.getCharacterId(), pilot.getName(), pilot.getBio(), pilot.getLookingFor(),
                 pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
                 pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null,
                 skillEntries, List.of(), recentSkillEntries, killEntries, historyEntries
             );
@@ -110,7 +112,7 @@ public record PilotProfileResponse(
             pilot.getCharacterId(), pilot.getName(), pilot.getBio(), pilot.getLookingFor(),
             pilot.getRoles(), pilot.getContent(), pilot.getActivity(), pilot.getVoice(),
             pilot.getVerified(), pilot.getManualTzActive(), pilot.getLanguages(), pilot.getIsPublic(),
-            enriched.getSp(), enriched.getSpByCat(), enriched.getTz(),
+            enriched.getTitle(), enriched.getEveBio(), enriched.getSp(), enriched.getSpByCat(), enriched.getTz(),
             enriched.getTzActive(), enriched.getTzPeak(), enriched.getLang(),
             enriched.getKbKills(), enriched.getKbLosses(), enriched.getKbEfficiency(),
             enriched.getIskDestroyed(), enriched.getHeatmap(), enriched.getLastSyncedAt(),

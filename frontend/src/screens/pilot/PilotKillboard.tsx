@@ -44,7 +44,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-      <div className="card">
+      <div className="card" style={{ alignSelf: 'start' }}>
         <div className="section-head"><h3>Lifetime stats</h3><span className="label">/ zkillboard</span></div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {p.kbKills != null && <Stat label="Kills" value={p.kbKills.toLocaleString()} accent />}
@@ -65,7 +65,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
       {topShips.length > 0 && (
         <div className="card" style={{ gridColumn: '1 / -1' }}>
           <div className="section-head"><h3>Top ships flown</h3><span className="label">/ from kill history</span></div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
             {topShips.map(({ ship, kills, losses, typeId }) => {
               const effectiveTypeId = typeId ?? resolvedTypeIds[ship];
               return (
