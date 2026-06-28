@@ -8,8 +8,8 @@ import { inferTz, hoursRange } from '../../utils/tz';
 import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, MAX_HR } from '../../utils/hr';
 import { parseRequirement, formatRequirement, splitRequirement } from '../../utils/requirements';
 
-const CORP_ACTIVITIES = ['Sov warfare', 'Small gang', 'Black ops', 'Wormhole', 'Low-sec', 'Fleet warfare', 'Mining', 'Industry', 'PvE', 'FW'];
-const CORP_ROLES_WANTED = ['Fleet Cmdr', 'Logi', 'DPS', 'Capital pilot', 'Scout', 'Industrialist', 'Dictor', 'Booster'];
+const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
+const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
 
 /** Find a declared minimum-SP requirement, matching on the label before the colon. */
