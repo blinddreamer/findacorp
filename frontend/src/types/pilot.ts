@@ -44,6 +44,7 @@ export interface PilotProfile {
   voice?: string;
   languages?: string[];
   verified: boolean;
+  isPublic?: boolean;
   updatedAt?: string;
   sp?: number;
   spByCat?: Record<string, number>;

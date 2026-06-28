@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS pilots (
     activity        VARCHAR(20),
     voice           VARCHAR(255),
     verified        BOOLEAN DEFAULT FALSE,
+    is_public       BOOLEAN DEFAULT TRUE,
     manual_tz_active JSON,
     updated_at      DATETIME DEFAULT NOW() ON UPDATE NOW()
 );
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS corps (
     languages     JSON,
     tz_hours      JSON,
     hr_ids        JSON,
+    is_public     BOOLEAN DEFAULT TRUE,
     status        ENUM('open','selective','closed') DEFAULT 'open',
     tz            VARCHAR(5),
     min_sp        BIGINT,
@@ -145,6 +147,8 @@ ALTER TABLE corps ADD COLUMN IF NOT EXISTS roles_looking JSON;
 ALTER TABLE corps ADD COLUMN IF NOT EXISTS languages JSON;
 ALTER TABLE corps ADD COLUMN IF NOT EXISTS tz_hours JSON;
 ALTER TABLE corps ADD COLUMN IF NOT EXISTS hr_ids JSON;
+ALTER TABLE pilots ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT TRUE;
+ALTER TABLE corps  ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT TRUE;
 ALTER TABLE corp_enriched ADD COLUMN IF NOT EXISTS ceo_id BIGINT;
 ALTER TABLE corp_enriched ADD COLUMN IF NOT EXISTS ceo_login_required BOOLEAN DEFAULT FALSE;
 -- Denormalized, queryable derivations for search filtering (see docs/search-db-pagination-spec.md)

@@ -34,6 +34,7 @@ export interface UpdateCorpRequest {
   languages?: string[];
   tzHours?: number[];
   hrIds?: number[];
+  isPublic?: boolean;
 }
 
 export async function updateCorp(corpId: number, req: UpdateCorpRequest): Promise<CorpProfile> {

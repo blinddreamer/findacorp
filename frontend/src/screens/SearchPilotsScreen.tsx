@@ -26,7 +26,7 @@ const ACTIVITY_OPTS = ['Daily', 'Weekly', 'Casual'];
 
 export default function SearchPilotsScreen() {
   const navigate = useNavigate();
-  const { isRecruiter, isResolved } = useRecruiterStatus();
+  const { isRecruiter, isResolved, hasListing } = useRecruiterStatus();
   const [showListingModal, setShowListingModal] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     tz: { EU: true, US: false, AU: false },
@@ -53,7 +53,7 @@ export default function SearchPilotsScreen() {
       roles: activeRoles || undefined,
       content: activeContent || undefined,
     }),
-    enabled: isRecruiter, // don't fire the (server-gated) search for non-recruiters
+    enabled: isRecruiter && hasListing, // require a published listing before searching
     staleTime: 2 * 60 * 1000,
   });
 
@@ -78,6 +78,19 @@ export default function SearchPilotsScreen() {
         </div>
       </div>
 
+      {!hasListing ? (
+        <div className="card" style={{ textAlign: 'center', padding: '48px 32px', maxWidth: 560, margin: '0 auto' }}>
+          <div className="eyebrow accent" style={{ justifyContent: 'center' }}>// listing required</div>
+          <h3 style={{ marginTop: 12, fontSize: 18 }}>Post your recruitment listing first</h3>
+          <p className="muted" style={{ marginTop: 10, fontSize: 13.5, lineHeight: 1.6 }}>
+            Before you can search and contact pilots, your corp needs a published recruitment
+            listing — that's how pilots find and apply to you in return.
+          </p>
+          <div style={{ marginTop: 20 }}>
+            <Btn primary onClick={() => setShowListingModal(true)}>+ Post recruitment listing</Btn>
+          </div>
+        </div>
+      ) : (
       <div className="two-col-r">
         <aside className="card" style={{ alignSelf: 'start', position: 'sticky', top: 72 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -145,6 +158,7 @@ export default function SearchPilotsScreen() {
           </div>
         </div>
       </div>
+      )}
 
       {showListingModal && <PostListingModal onClose={() => setShowListingModal(false)} />}
     </div>

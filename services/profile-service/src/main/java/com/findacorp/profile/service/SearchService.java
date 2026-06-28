@@ -74,11 +74,11 @@ public class SearchService {
         if (q == null || q.isBlank()) return List.of();
         List<GlobalSearchResult> results = new ArrayList<>();
 
-        pilotRepository.findByNameContainingIgnoreCaseOrderByNameAsc(q)
+        pilotRepository.findByNameContainingIgnoreCaseAndIsPublicTrueOrderByNameAsc(q)
             .stream().limit(limit)
             .forEach(p -> results.add(new GlobalSearchResult("pilot", p.getCharacterId(), p.getName(), null)));
 
-        corpRepository.findByNameContainingIgnoreCaseOrderByNameAsc(q)
+        corpRepository.findByNameContainingIgnoreCaseAndIsPublicTrueOrderByNameAsc(q)
             .stream().limit(limit)
             .forEach(c -> results.add(new GlobalSearchResult("corp", c.getCorpId(), c.getName(), c.getTicker())));
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getPilot, getCorp } from '../api/profileApi';
 import { useAuth } from './useAuth';
-import { currentCorpId, isCeoOrHr } from '../utils/hr';
+import { currentCorpId, isCeoOrHr, hasCorpListing } from '../utils/hr';
 import { CORP_EDIT_RESTRICTED } from '../config';
 
 export interface RecruiterStatus {
@@ -9,6 +9,10 @@ export interface RecruiterStatus {
   isRecruiter: boolean;
   /** False while the underlying profile/corp lookups are still in flight. */
   isResolved: boolean;
+  /** The user's current corp id, when known. */
+  corpId: number | null;
+  /** True once the user's corp has a published recruitment listing. */
+  hasListing: boolean;
 }
 
 /**
@@ -38,14 +42,17 @@ export function useRecruiterStatus(): RecruiterStatus {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (!auth.characterId) return { isRecruiter: false, isResolved: true };
-  if (!CORP_EDIT_RESTRICTED) return { isRecruiter: true, isResolved: true }; // dev mode
+  const corpId_ = corpId ?? null;
+  const hasListing = hasCorpListing(corpQuery.data);
 
-  if (pilotQuery.isPending) return { isRecruiter: false, isResolved: false };
-  if (!corpId) return { isRecruiter: false, isResolved: true }; // no corp ⇒ not a recruiter
-  if (corpQuery.isPending) return { isRecruiter: false, isResolved: false };
+  if (!auth.characterId) return { isRecruiter: false, isResolved: true, corpId: null, hasListing: false };
+  if (!CORP_EDIT_RESTRICTED) return { isRecruiter: true, isResolved: true, corpId: corpId_, hasListing }; // dev mode
 
-  return { isRecruiter: isCeoOrHr(corpQuery.data, auth.characterId), isResolved: true };
+  if (pilotQuery.isPending) return { isRecruiter: false, isResolved: false, corpId: corpId_, hasListing };
+  if (!corpId) return { isRecruiter: false, isResolved: true, corpId: null, hasListing: false }; // no corp ⇒ not a recruiter
+  if (corpQuery.isPending) return { isRecruiter: false, isResolved: false, corpId: corpId_, hasListing };
+
+  return { isRecruiter: isCeoOrHr(corpQuery.data, auth.characterId), isResolved: true, corpId: corpId_, hasListing };
 }
 
 /** Convenience boolean for places that don't need the loading state (e.g. nav). */

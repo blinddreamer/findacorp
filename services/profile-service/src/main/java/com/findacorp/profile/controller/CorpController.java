@@ -38,8 +38,10 @@ public class CorpController {
     }
 
     @GetMapping("/corp/{corpId}")
-    public ResponseEntity<CorpProfileResponse> getProfile(@PathVariable("corpId") Long corpId) {
-        return ResponseEntity.ok(corpService.getProfile(corpId));
+    public ResponseEntity<CorpProfileResponse> getProfile(
+            @PathVariable("corpId") Long corpId,
+            @RequestHeader(value = "X-Character-Id", required = false) Long requesterId) {
+        return ResponseEntity.ok(corpService.getProfile(corpId, requesterId));
     }
 
     @PutMapping("/corp/{corpId}")

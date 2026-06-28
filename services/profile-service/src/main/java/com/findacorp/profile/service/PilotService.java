@@ -29,9 +29,15 @@ public class PilotService {
     private final PilotKillHistoryRepository killHistoryRepository;
     private final PilotCorpHistoryRepository corpHistoryRepository;
 
-    public PilotProfileResponse getProfile(Long characterId) {
+    public PilotProfileResponse getProfile(Long characterId, Long requesterId) {
         Pilot pilot = pilotRepository.findById(characterId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pilot not found"));
+
+        // Private profiles are visible only to their owner; everyone else gets a 404 so a
+        // private profile is indistinguishable from a non-existent one.
+        if (Boolean.FALSE.equals(pilot.getIsPublic()) && !characterId.equals(requesterId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pilot not found");
+        }
 
         PilotEnriched enriched = pilotEnrichedRepository.findById(characterId).orElse(null);
         List<PilotSkill> skills = pilotSkillRepository.findByCharacterId(characterId);
@@ -63,6 +69,7 @@ public class PilotService {
         if (req.voice() != null) pilot.setVoice(req.voice());
         if (req.manualTzActive() != null) pilot.setManualTzActive(req.manualTzActive());
         if (req.languages() != null) pilot.setLanguages(req.languages());
+        if (req.isPublic() != null) pilot.setIsPublic(req.isPublic());
 
         pilot = pilotRepository.save(pilot);
 

@@ -26,6 +26,22 @@ export function isCeoOrHr(corp: CorpProfile | null | undefined, characterId: num
   return corp.ceoId === characterId || (corp.hrIds ?? []).includes(characterId);
 }
 
+/**
+ * True once a corp has a published recruitment listing — i.e. a recruiter has entered
+ * any listing content. A bare, auto-synced corp (no recruiter input) is not "listed".
+ */
+export function hasCorpListing(corp: CorpProfile | null | undefined): boolean {
+  if (!corp) return false;
+  return Boolean(
+    corp.tagline?.trim()
+    || corp.pitch?.trim()
+    || corp.rolesLooking?.length
+    || corp.requirements?.length
+    || corp.content?.length
+    || corp.tzHours?.length,
+  );
+}
+
 /** Add id if absent, remove if present — toggle semantics for HR appointment. */
 export function toggleId(ids: number[], id: number): number[] {
   return ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];

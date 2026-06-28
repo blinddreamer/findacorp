@@ -44,6 +44,10 @@ public class Pilot {
 
     private Boolean verified = false;
 
+    /** When false, the profile is hidden from search and direct access (owner-only). */
+    @Column(name = "is_public")
+    private Boolean isPublic = true;
+
     @Convert(converter = IntegerListConverter.class)
     @Column(name = "manual_tz_active", columnDefinition = "JSON")
     private List<Integer> manualTzActive;

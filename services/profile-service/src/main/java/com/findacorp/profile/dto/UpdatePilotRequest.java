@@ -10,5 +10,6 @@ public record UpdatePilotRequest(
     String activity,
     String voice,
     List<Integer> manualTzActive,
-    List<String> languages
+    List<String> languages,
+    Boolean isPublic
 ) {}

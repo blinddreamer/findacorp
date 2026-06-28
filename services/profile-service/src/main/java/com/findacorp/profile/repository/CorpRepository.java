@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface CorpRepository extends JpaRepository<Corp, Long> {
 
-    List<Corp> findByNameContainingIgnoreCaseOrderByNameAsc(String name);
+    List<Corp> findByNameContainingIgnoreCaseAndIsPublicTrueOrderByNameAsc(String name);
 
     /**
      * DB-side filtered + paged corp search. Content uses JSON_OVERLAPS; tz and min_sp filter
@@ -25,6 +25,7 @@ public interface CorpRepository extends JpaRepository<Corp, Long> {
           AND (:contentJson IS NULL OR JSON_OVERLAPS(c.content, :contentJson))
           AND (:filterTz = 0 OR c.tz IN (:tzList))
           AND (:maxMinSp IS NULL OR c.min_sp IS NULL OR c.min_sp <= :maxMinSp)
+          AND (c.is_public IS NULL OR c.is_public = TRUE)
         ORDER BY
           CASE WHEN :sort = 'efficiency' THEN ce.efficiency END DESC,
           ce.members DESC
@@ -35,6 +36,7 @@ public interface CorpRepository extends JpaRepository<Corp, Long> {
           AND (:contentJson IS NULL OR JSON_OVERLAPS(c.content, :contentJson))
           AND (:filterTz = 0 OR c.tz IN (:tzList))
           AND (:maxMinSp IS NULL OR c.min_sp IS NULL OR c.min_sp <= :maxMinSp)
+          AND (c.is_public IS NULL OR c.is_public = TRUE)
         """,
         nativeQuery = true)
     Page<Corp> search(

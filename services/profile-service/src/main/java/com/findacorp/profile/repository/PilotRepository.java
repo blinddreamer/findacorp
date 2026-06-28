@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface PilotRepository extends JpaRepository<Pilot, Long> {
 
-    List<Pilot> findByNameContainingIgnoreCaseOrderByNameAsc(String name);
+    List<Pilot> findByNameContainingIgnoreCaseAndIsPublicTrueOrderByNameAsc(String name);
 
     /**
      * DB-side filtered + paged pilot search. Scalar predicates run on indexed columns; the
@@ -27,6 +27,7 @@ public interface PilotRepository extends JpaRepository<Pilot, Long> {
           AND (:activity IS NULL OR p.activity = :activity)
           AND (:rolesJson IS NULL OR JSON_OVERLAPS(p.roles, :rolesJson))
           AND (:contentJson IS NULL OR JSON_OVERLAPS(p.content, :contentJson))
+          AND (p.is_public IS NULL OR p.is_public = TRUE)
         ORDER BY
           CASE WHEN :sort = 'eff' THEN pe.kb_efficiency END DESC,
           CASE WHEN :sort = 'kills' THEN pe.kb_kills END DESC,
@@ -41,6 +42,7 @@ public interface PilotRepository extends JpaRepository<Pilot, Long> {
           AND (:activity IS NULL OR p.activity = :activity)
           AND (:rolesJson IS NULL OR JSON_OVERLAPS(p.roles, :rolesJson))
           AND (:contentJson IS NULL OR JSON_OVERLAPS(p.content, :contentJson))
+          AND (p.is_public IS NULL OR p.is_public = TRUE)
         """,
         nativeQuery = true)
     Page<Pilot> search(

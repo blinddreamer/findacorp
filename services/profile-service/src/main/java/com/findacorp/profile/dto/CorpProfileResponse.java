@@ -25,6 +25,7 @@ public record CorpProfileResponse(
     List<String> languages,
     List<Integer> tzHours,
     List<Long> hrIds,
+    Boolean isPublic,
     LocalDateTime updatedAt,
     // enriched fields (nullable)
     Integer members,
@@ -58,7 +59,7 @@ public record CorpProfileResponse(
             corp.getTagline(), corp.getPitch(), corp.getRequirements(),
             corp.getContent(), corp.getStatus(),
             corp.getRolesLooking(), corp.getLanguages(), corp.getTzHours(),
-            corp.getHrIds(), corp.getUpdatedAt(),
+            corp.getHrIds(), corp.getIsPublic(), corp.getUpdatedAt(),
             enriched != null ? enriched.getMembers() : null,
             enriched != null ? enriched.getCapacity() : null,
             enriched != null ? enriched.getAlliance() : null,
