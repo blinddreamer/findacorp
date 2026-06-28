@@ -16,6 +16,7 @@ import OnboardingModal from './pilot/OnboardingModal';
 import VisibilityToggle from '../components/VisibilityToggle';
 import { fmtSP } from '../utils/format';
 import { inferTz } from '../utils/tz';
+import { cleanEveBio } from '../utils/eveText';
 
 /** A profile fetch fails with 403/404 when it's private (or absent) — bounce non-owners home. */
 function isHiddenError(error: unknown): boolean {
@@ -155,6 +156,9 @@ export default function PilotProfileScreen() {
     ? (draftTzHours.length > 0 ? inferTz(draftTzHours) : p.tz)
     : (p.manualTzActive?.length ? inferTz(p.manualTzActive) : p.tz);
 
+  // EVE corp title carries the same rich-text markup as the bio — strip it for display.
+  const eveTitle = cleanEveBio(p.title);
+
   return (
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
@@ -199,11 +203,11 @@ export default function PilotProfileScreen() {
           <Portrait id={p.characterId} name={p.name} />
         </div>
         <div className="ident" style={{ display: 'flex', flexDirection: 'column' }}>
-          {p.title ? (
+          {eveTitle ? (
             <>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                 <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: -40 }}>
-                  {p.title}
+                  {eveTitle}
                 </div>
               </div>
               <div className="ticker">{p.corpHistory?.find(h => !h.toDate)?.corpName}</div>
