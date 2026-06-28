@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CorpService {
 
+    /** Maximum number of HR managers a CEO may appoint for a corp. */
+    public static final int MAX_HR = 2;
+
     private final CorpRepository corpRepository;
     private final CorpEnrichedRepository corpEnrichedRepository;
     private final CorpAllianceHistoryRepository allianceHistoryRepository;
@@ -125,7 +128,13 @@ public class CorpService {
         if (req.rolesLooking() != null) corp.setRolesLooking(req.rolesLooking());
         if (req.languages() != null)    corp.setLanguages(req.languages());
         if (req.tzHours() != null)      corp.setTzHours(req.tzHours());
-        if (req.hrIds() != null)        corp.setHrIds(req.hrIds());
+        if (req.hrIds() != null) {
+            if (req.hrIds().size() > MAX_HR) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "A corp may have at most " + MAX_HR + " HR managers");
+            }
+            corp.setHrIds(req.hrIds());
+        }
 
         // Keep the denormalized, search-queryable derivations in sync with the raw fields.
         corp.setTz(CorpDerived.inferTz(corp.getTzHours()));

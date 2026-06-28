@@ -161,7 +161,7 @@ function ThreadRow({
     >
       {counterpartIsPilot
         ? <Avatar seed={name} size={40} />
-        : <CorpLogo seed={name} size={40} />
+        : <CorpLogo corpId={thread.corpId} seed={name} size={40} />
       }
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: 13, fontWeight: thread.unread ? 600 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

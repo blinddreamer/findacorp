@@ -1,25 +1,8 @@
-import { useState } from 'react';
 import type { CorpProfile } from '../../types/corp';
 import Btn from '../../components/Btn';
 import Stat from '../../components/Stat';
 
-export default function CorpKillboard({ c, onSync }: { c: CorpProfile; onSync: () => Promise<void> }) {
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState('');
-
-  async function handleSync() {
-    setSyncing(true);
-    setSyncMsg('');
-    try {
-      await onSync();
-      setSyncMsg('Sync triggered — data will update in a few seconds.');
-    } catch {
-      setSyncMsg('Sync failed — data-collector may be unavailable.');
-    } finally {
-      setSyncing(false);
-    }
-  }
-
+export default function CorpKillboard({ c }: { c: CorpProfile }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
       <div className="card">
@@ -51,12 +34,6 @@ export default function CorpKillboard({ c, onSync }: { c: CorpProfile; onSync: (
           <Btn ghost onClick={() => window.open(`https://evewho.com/corp/${c.corpId}`, '_blank')}>
             View on EVE Who ↗
           </Btn>
-          <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 10, marginTop: 4 }}>
-            <Btn ghost onClick={handleSync} disabled={syncing} style={{ width: '100%' }}>
-              {syncing ? 'Syncing…' : '↺ Re-sync from zKillboard'}
-            </Btn>
-            {syncMsg && <div style={{ fontSize: 12, color: 'var(--text-mute)', marginTop: 8 }}>{syncMsg}</div>}
-          </div>
         </div>
       </div>
     </div>

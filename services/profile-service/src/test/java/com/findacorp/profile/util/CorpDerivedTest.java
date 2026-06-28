@@ -43,4 +43,10 @@ class CorpDerivedTest {
         assertThat(CorpDerived.parseMinSp(List.of("Voice: yes", "Minimum SP: 10M", "SP: 20M")))
             .isEqualTo(10_000_000L);
     }
+
+    @Test
+    void parseMinSp_ignoresOptionalMarker() {
+        assertThat(CorpDerived.parseMinSp(List.of("SP: 25M (optional)"))).isEqualTo(25_000_000L);
+        assertThat(CorpDerived.parseMinSp(List.of("Minimum SP: 10M (Optional)"))).isEqualTo(10_000_000L);
+    }
 }

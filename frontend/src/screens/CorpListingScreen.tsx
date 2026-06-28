@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getCorp, updateCorp, getPilot, syncCorp } from '../api/profileApi';
+import { getCorp, updateCorp, getPilot } from '../api/profileApi';
 import { useAuth } from '../auth/useAuth';
 import CorpLogo from '../components/CorpLogo';
 import Pill from '../components/Pill';
@@ -114,12 +114,6 @@ export default function CorpListingScreen() {
     }
   }
 
-  async function handleSync() {
-    if (!c) return;
-    await syncCorp(c.corpId);
-    setTimeout(() => queryClient.invalidateQueries({ queryKey: ['corp', id] }), 3000);
-  }
-
   function shareProfile() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
@@ -175,7 +169,7 @@ export default function CorpListingScreen() {
       {/* ── Hero ── */}
       <div className="profile-hero">
         <div style={{ width: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <CorpLogo seed={c.name ?? String(c.corpId)} size={140} faction={c.faction} />
+          <CorpLogo corpId={c.corpId} seed={c.name ?? String(c.corpId)} size={140} faction={c.faction} />
           <div className="mono" style={{ fontSize: 11, color: 'var(--text-dim)' }}>
             {c.ticker}{c.founded ? ` · founded ${c.founded}` : ''}
           </div>
@@ -237,7 +231,7 @@ export default function CorpListingScreen() {
         />
       )}
       {tab === 'members' && <CorpMembers c={c} />}
-      {tab === 'killboard' && <CorpKillboard c={c} onSync={handleSync} />}
+      {tab === 'killboard' && <CorpKillboard c={c} />}
       {tab === 'history' && <CorpHistory c={c} />}
 
       {applying && (

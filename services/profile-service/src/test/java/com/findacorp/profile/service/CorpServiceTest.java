@@ -6,6 +6,7 @@ import com.findacorp.profile.domain.CorpEnriched;
 import com.findacorp.profile.domain.CorpMember;
 import com.findacorp.profile.domain.CorpMemberEvent;
 import com.findacorp.profile.domain.PilotCorpHistory;
+import com.findacorp.profile.dto.UpdateCorpRequest;
 import com.findacorp.profile.feign.NotificationClient;
 import com.findacorp.profile.repository.*;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -23,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -77,6 +81,31 @@ class CorpServiceTest {
     @Test
     void canEdit_falseForNullCharacter() {
         assertThat(corpService.canEdit(1L, null)).isFalse();
+    }
+
+    // ── upsertCorp: HR-cap enforcement ────────────────────────────────────────
+
+    /** Update request that only sets the HR roster (all other fields left null/unchanged). */
+    private UpdateCorpRequest hrRequest(List<Long> hrIds) {
+        return new UpdateCorpRequest(null, null, null, null, null, null, null, null,
+            null, null, null, null, hrIds);
+    }
+
+    @Test
+    void upsertCorp_rejectsMoreThanMaxHr() {
+        assertThatThrownBy(() -> corpService.upsertCorp(1L, hrRequest(List.of(200L, 201L, 202L))))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
+        verify(corpRepository, never()).save(any());
+    }
+
+    @Test
+    void upsertCorp_acceptsExactlyMaxHr() {
+        when(corpRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var resp = corpService.upsertCorp(1L, hrRequest(List.of(200L, 201L)));
+
+        assertThat(resp.hrIds()).containsExactly(200L, 201L);
     }
 
     // ── isRecruiter: CEO/HR of the caller's current corp ──────────────────────

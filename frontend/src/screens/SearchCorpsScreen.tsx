@@ -122,7 +122,7 @@ function CorpResultRow({ c, fit, onClick }: { c: CorpSearchResult; fit: number; 
   const statusKind = c.status === 'open' ? 'good' : c.status === 'selective' ? 'accent' : 'danger';
   return (
     <div className="corp-card" onClick={onClick}>
-      <CorpLogo seed={c.name ?? String(c.corpId)} size={64} faction={c.faction} />
+      <CorpLogo corpId={c.corpId} seed={c.name ?? String(c.corpId)} size={64} faction={c.faction} />
       <div style={{ minWidth: 0 }}>
         {c.ticker && c.alliance && <div className="ticker">{c.ticker} · {c.alliance}</div>}
         <div className="name">{c.name ?? `Corp #${c.corpId}`}</div>

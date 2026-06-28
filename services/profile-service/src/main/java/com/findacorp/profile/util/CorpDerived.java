@@ -25,7 +25,8 @@ public final class CorpDerived {
     /** Find a declared minimum-SP requirement (in raw SP), matching on the label before the colon. */
     public static Long parseMinSp(List<String> requirements) {
         if (requirements == null) return null;
-        for (String r : requirements) {
+        for (String raw : requirements) {
+            String r = stripOptionalMarker(raw);
             int idx = r.indexOf(':');
             if (idx < 0) continue;
             if (isSpLabel(r.substring(0, idx))) {
@@ -34,6 +35,15 @@ public final class CorpDerived {
             }
         }
         return null;
+    }
+
+    /**
+     * Drop the trailing "(optional)" marker the frontend appends to optional requirements,
+     * so SP parsing works whether the requirement is mandatory or optional.
+     */
+    private static String stripOptionalMarker(String r) {
+        if (r == null) return "";
+        return r.replaceFirst("(?i)\\s*\\(optional\\)\\s*$", "");
     }
 
     /** True for labels like "SP", "Minimum SP", "Min SP", "Skill Points" — but not "Response time". */

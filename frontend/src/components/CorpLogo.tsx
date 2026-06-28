@@ -1,15 +1,34 @@
+import { useState } from 'react';
+
 interface CorpLogoProps {
+  corpId?: number | null;
   seed?: string;
   size?: number;
   faction?: string;
 }
 
-export default function CorpLogo({ seed = 'c', size = 64, faction }: CorpLogoProps) {
+export default function CorpLogo({ corpId, seed = 'c', size = 64, faction }: CorpLogoProps) {
+  const [failed, setFailed] = useState(false);
+
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   const facHue: Record<string, number> = { caldari: 240, amarr: 80, gallente: 150, minmatar: 40 };
   const fh = facHue[faction ?? ''] ?? 240;
   const shape = h % 4;
+
+  // Render the real EVE corporation logo when we have an id; fall back to the
+  // generated glyph if there's no id or the image fails to load.
+  if (corpId && !failed) {
+    return (
+      <img
+        src={`https://images.evetech.net/corporations/${corpId}/logo?size=256`}
+        alt={seed}
+        onError={() => setFailed(true)}
+        style={{ width: size, height: size, borderRadius: 6, border: '1px solid var(--border)', objectFit: 'cover', display: 'block' }}
+      />
+    );
+  }
+
   return (
     <div style={{ width: size, height: size, borderRadius: 6, border: '1px solid var(--border)', background: `linear-gradient(135deg, oklch(0.22 0.02 ${fh}), oklch(0.18 0.015 ${fh}))`, display: 'grid', placeItems: 'center', position: 'relative', overflow: 'hidden' }}>
       <svg viewBox="0 0 32 32" width="70%" height="70%">

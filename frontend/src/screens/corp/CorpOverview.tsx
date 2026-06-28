@@ -5,7 +5,8 @@ import Stat from '../../components/Stat';
 import TzRangeEditor from '../../components/TzRangeEditor';
 import { fmtSP } from '../../utils/format';
 import { inferTz, hoursRange } from '../../utils/tz';
-import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds } from '../../utils/hr';
+import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, MAX_HR } from '../../utils/hr';
+import { parseRequirement, formatRequirement, splitRequirement } from '../../utils/requirements';
 
 const CORP_ACTIVITIES = ['Sov warfare', 'Small gang', 'Black ops', 'Wormhole', 'Low-sec', 'Fleet warfare', 'Mining', 'Industry', 'PvE', 'FW'];
 const CORP_ROLES_WANTED = ['Fleet Cmdr', 'Logi', 'DPS', 'Capital pilot', 'Scout', 'Industrialist', 'Dictor', 'Booster'];
@@ -14,7 +15,8 @@ const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean
 /** Find a declared minimum-SP requirement, matching on the label before the colon. */
 function findMinSp(requirements?: string[]): number | null {
   if (!requirements) return null;
-  for (const r of requirements) {
+  for (const raw of requirements) {
+    const r = parseRequirement(raw).text;
     const idx = r.indexOf(':');
     if (idx === -1) continue;
     const label = r.slice(0, idx).trim().toLowerCase();
@@ -84,7 +86,26 @@ export default function CorpOverview({
     onLanguagesChange(draftLanguages.includes(l) ? draftLanguages.filter(x => x !== l) : [...draftLanguages, l]);
   }
   function toggleHr(id: number) {
+    // Allow removing, but block appointing beyond the cap.
+    if (!draftHrIds.includes(id) && draftHrIds.length >= MAX_HR) return;
     onHrIdsChange(toggleId(draftHrIds, id));
+  }
+
+  // ── Requirements editing ──────────────────────────────────────────────────
+  // draftRequirements stays a newline-joined string (one encoded requirement per
+  // line) so the parent's save path is unchanged; the editor maps it to rows.
+  const reqRows = draftRequirements.split('\n').map(parseRequirement);
+  function commitReqRows(rows: { text: string; optional: boolean }[]) {
+    onRequirementsChange(rows.map(r => formatRequirement(r.text, r.optional)).join('\n'));
+  }
+  function updateReq(i: number, patch: Partial<{ text: string; optional: boolean }>) {
+    commitReqRows(reqRows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  }
+  function addReq() {
+    commitReqRows([...reqRows, { text: '', optional: false }]);
+  }
+  function removeReq(i: number) {
+    commitReqRows(reqRows.filter((_, idx) => idx !== i));
   }
 
   // ── HR management (CEO only) ──────────────────────────────────────────────
@@ -287,16 +308,21 @@ export default function CorpOverview({
             {isEditing && isCeo ? (
               <>
                 <div className="muted" style={{ fontSize: 12, marginBottom: 12 }}>
-                  Appoint corp members who may edit this listing and trigger syncs. As CEO you always have access.
+                  Appoint up to {MAX_HR} corp members who may edit this listing and trigger syncs. As CEO you always have access.
+                  {' '}<span style={{ color: 'var(--text-mid)' }}>({draftHrIds.length}/{MAX_HR} appointed)</span>
                 </div>
                 {candidates.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto' }}>
-                    {candidates.map(m => (
-                      <label key={m.characterId} className="checkbox-row" style={{ cursor: 'pointer' }}>
-                        <input type="checkbox" checked={draftHrIds.includes(m.characterId)} onChange={() => toggleHr(m.characterId)} />
-                        <span>{m.characterName}</span>
-                      </label>
-                    ))}
+                    {candidates.map(m => {
+                      const checked = draftHrIds.includes(m.characterId);
+                      const atCap = !checked && draftHrIds.length >= MAX_HR;
+                      return (
+                        <label key={m.characterId} className="checkbox-row" style={{ cursor: atCap ? 'not-allowed' : 'pointer', opacity: atCap ? 0.5 : 1 }}>
+                          <input type="checkbox" checked={checked} disabled={atCap} onChange={() => toggleHr(m.characterId)} />
+                          <span>{m.characterName}</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="muted" style={{ fontSize: 13 }}>No corp members synced yet — run a sync to populate the roster.</div>
@@ -348,25 +374,67 @@ export default function CorpOverview({
         {/* Requirements */}
         {(isEditing || (c.requirements?.length ?? 0) > 0) && (
           <div className="card">
-            <div className="section-head"><h3>Requirements</h3><span className="label">/ non-negotiable</span></div>
+            <div className="section-head"><h3>Requirements</h3><span className="label">/ what we expect</span></div>
             {isEditing ? (
-              <textarea
-                className="input"
-                placeholder={"One per line:\nSP: 10,000,000\nESI: Required\nVoice: Mandatory"}
-                value={draftRequirements}
-                onChange={e => onRequirementsChange(e.target.value)}
-                style={{ minHeight: 80, fontSize: 13, resize: 'vertical', width: '100%' }}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Add requirements as <span className="mono">Label: value</span> and mark each mandatory or optional.
+                </div>
+                {reqRows.map((row, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      className="input"
+                      placeholder="e.g. SP: 10,000,000"
+                      value={row.text}
+                      onChange={e => updateReq(i, { text: e.target.value })}
+                      style={{ flex: 1, fontSize: 13 }}
+                    />
+                    <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
+                      {([['Required', false], ['Optional', true]] as const).map(([lbl, opt]) => (
+                        <button
+                          key={lbl}
+                          type="button"
+                          onClick={() => updateReq(i, { optional: opt })}
+                          style={{
+                            padding: '6px 10px', fontSize: 12, cursor: 'pointer', border: 'none',
+                            background: row.optional === opt ? 'var(--accent-soft)' : 'var(--bg-elev)',
+                            color: row.optional === opt ? 'var(--accent-text)' : 'var(--text-mute)',
+                          }}
+                        >
+                          {lbl}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeReq(i)}
+                      title="Remove requirement"
+                      style={{ flexShrink: 0, background: 'none', border: 'none', color: 'var(--text-mute)', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addReq}
+                  style={{ alignSelf: 'flex-start', background: 'none', border: '1px dashed var(--border)', borderRadius: 4, color: 'var(--text-mid)', cursor: 'pointer', fontSize: 12, padding: '6px 10px' }}
+                >
+                  + Add requirement
+                </button>
+              </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                {c.requirements!.map((r, i) => {
-                  const idx = r.indexOf(':');
-                  const lbl = idx !== -1 ? r.slice(0, idx).trim() : r;
-                  const val = idx !== -1 ? r.slice(idx + 1).trim() : '';
+                {c.requirements!.map((raw, i) => {
+                  const { text, optional } = parseRequirement(raw);
+                  const { label, value } = splitRequirement(text);
                   return (
                     <div key={i} style={{ padding: '12px 16px', borderTop: i > 1 ? '1px solid var(--border-soft)' : 'none', borderRight: i % 2 === 0 ? '1px solid var(--border-soft)' : 'none' }}>
-                      <div className="stat-label">{lbl}</div>
-                      <div className="mono" style={{ fontSize: 14, marginTop: 4 }}>{val || '—'}</div>
+                      <div className="stat-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {label}
+                        <Pill kind={optional ? undefined : 'accent'}>{optional ? 'Optional' : 'Required'}</Pill>
+                      </div>
+                      <div className="mono" style={{ fontSize: 14, marginTop: 4 }}>{value || '—'}</div>
                     </div>
                   );
                 })}

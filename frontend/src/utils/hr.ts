@@ -1,6 +1,9 @@
 import type { CorpMemberEntry, CorpProfile } from '../types/corp';
 import type { PilotProfile } from '../types/pilot';
 
+/** Maximum number of HR managers a CEO may appoint — mirrors CorpService.MAX_HR on the backend. */
+export const MAX_HR = 2;
+
 /**
  * The pilot's current corp id, taken from their corp history: the open entry
  * (toDate === null). Falls back to the most recent dated entry when none are

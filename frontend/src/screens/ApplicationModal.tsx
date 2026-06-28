@@ -78,7 +78,7 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
             <div style={{ display: 'flex', gap: 12, padding: 12, marginTop: 16, background: 'var(--bg-base)', borderRadius: 6, border: '1px solid var(--border-soft)' }}>
               {isPilotContact
                 ? <Avatar seed={ctx.targetName} size={44} />
-                : <CorpLogo seed={ctx.targetName} size={44} faction={ctx.targetFaction} />}
+                : <CorpLogo corpId={ctx.targetId} seed={ctx.targetName} size={44} faction={ctx.targetFaction} />}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 500 }}>{ctx.targetName}</div>
                 <div className="muted mono" style={{ fontSize: 11, marginTop: 2 }}>

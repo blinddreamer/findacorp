@@ -6,6 +6,7 @@ import CorpLogo from '../components/CorpLogo';
 import Pill from '../components/Pill';
 import Btn from '../components/Btn';
 import TzRangeEditor from '../components/TzRangeEditor';
+import { parseRequirement, formatRequirement } from '../utils/requirements';
 
 const CONTENT_TYPES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Plexing', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
@@ -159,7 +160,7 @@ export default function PostListingModal({ onClose }: { onClose: () => void }) {
               </div>
               {corp && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
-                  <CorpLogo seed={corp.name ?? String(corpId)} size={48} faction={corp.faction} />
+                  <CorpLogo corpId={corpId} seed={corp.name ?? String(corpId)} size={48} faction={corp.faction} />
                   <div>
                     <div className="mono" style={{ fontSize: 11, color: 'var(--accent-text)' }}>{corp.ticker}</div>
                     {corp.alliance && <div className="mono" style={{ fontSize: 11, color: 'var(--text-dim)' }}>{corp.alliance}</div>}
@@ -289,20 +290,39 @@ export default function PostListingModal({ onClose }: { onClose: () => void }) {
                 Requirements <span className="muted" style={{ fontWeight: 400 }}>· format "Label: value" e.g. "Minimum SP: 25M"</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {requirements.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8 }}>
-                    <input
-                      className="input"
-                      style={{ flex: 1 }}
-                      placeholder='e.g. "Minimum SP: 25M" or "ESI: Full required"'
-                      value={r}
-                      onChange={e => setReq(i, e.target.value)}
-                    />
-                    {requirements.length > 1 && (
-                      <Btn sm ghost onClick={() => removeReq(i)} style={{ flexShrink: 0 }}>✕</Btn>
-                    )}
-                  </div>
-                ))}
+                {requirements.map((r, i) => {
+                  const { text, optional } = parseRequirement(r);
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <input
+                        className="input"
+                        style={{ flex: 1 }}
+                        placeholder='e.g. "Minimum SP: 25M" or "ESI: Full required"'
+                        value={text}
+                        onChange={e => setReq(i, formatRequirement(e.target.value, optional))}
+                      />
+                      <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden', flexShrink: 0 }}>
+                        {([['Required', false], ['Optional', true]] as const).map(([lbl, opt]) => (
+                          <button
+                            key={lbl}
+                            type="button"
+                            onClick={() => setReq(i, formatRequirement(text, opt))}
+                            style={{
+                              padding: '6px 10px', fontSize: 12, cursor: 'pointer', border: 'none',
+                              background: optional === opt ? 'var(--accent-soft)' : 'var(--bg-elev)',
+                              color: optional === opt ? 'var(--accent-text)' : 'var(--text-mute)',
+                            }}
+                          >
+                            {lbl}
+                          </button>
+                        ))}
+                      </div>
+                      {requirements.length > 1 && (
+                        <Btn sm ghost onClick={() => removeReq(i)} style={{ flexShrink: 0 }}>✕</Btn>
+                      )}
+                    </div>
+                  );
+                })}
                 <Btn sm ghost onClick={addReq} style={{ alignSelf: 'flex-start' }}>+ Add requirement</Btn>
               </div>
             </div>
