@@ -198,21 +198,39 @@ export default function PilotProfileScreen() {
         <div style={{ width: 220 }}>
           <Portrait id={p.characterId} name={p.name} />
         </div>
-        <div className="ident" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          {p.title && (
-            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: 2 }}>
-              {p.title}
-            </div>
+        <div className="ident" style={{ display: 'flex', flexDirection: 'column' }}>
+          {p.title ? (
+            <>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase' }}>
+                  {p.title}
+                </div>
+              </div>
+              <div className="ticker">{p.ticker} {p.corp}</div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <h1 style={{ marginTop: 0 }}>{p.name ?? `Pilot #${p.characterId}`}</h1>
+                <div className="meta">
+                  {displayTz && <span><Pill kind="good"><span className="dot" />{displayTz} prime</Pill></span>}
+                  {p.sp != null && <span className="mono">{fmtSP(p.sp)} SP</span>}
+                  {p.activity && <><span className="dim">·</span><span>{p.activity}</span></>}
+                  {p.verified && <span className="mono" style={{ color: 'var(--good)', fontSize: 11 }}>✓ ESI verified</span>}
+                  {!isEditing && p.isPublic === false && <Pill kind="danger"><span className="dot" />Private</Pill>}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="ticker">{p.ticker} {p.corp}</div>
+              <h1>{p.name ?? `Pilot #${p.characterId}`}</h1>
+              <div className="meta">
+                {displayTz && <span><Pill kind="good"><span className="dot" />{displayTz} prime</Pill></span>}
+                {p.sp != null && <span className="mono">{fmtSP(p.sp)} SP</span>}
+                {p.activity && <><span className="dim">·</span><span>{p.activity}</span></>}
+                {p.verified && <span className="mono" style={{ color: 'var(--good)', fontSize: 11 }}>✓ ESI verified</span>}
+                {!isEditing && p.isPublic === false && <Pill kind="danger"><span className="dot" />Private</Pill>}
+              </div>
+            </>
           )}
-          <div className="ticker">{p.ticker} {p.corp}</div>
-          <h1>{p.name ?? `Pilot #${p.characterId}`}</h1>
-          <div className="meta">
-            {displayTz && <span><Pill kind="good"><span className="dot" />{displayTz} prime</Pill></span>}
-            {p.sp != null && <span className="mono">{fmtSP(p.sp)} SP</span>}
-            {p.activity && <><span className="dim">·</span><span>{p.activity}</span></>}
-            {p.verified && <span className="mono" style={{ color: 'var(--good)', fontSize: 11 }}>✓ ESI verified</span>}
-            {!isEditing && p.isPublic === false && <Pill kind="danger"><span className="dot" />Private</Pill>}
-          </div>
           {isEditing ? (
             <textarea
               className="input"
