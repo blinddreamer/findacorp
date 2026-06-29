@@ -202,7 +202,7 @@ export default function PilotProfileScreen() {
           {p.title ? (
             <>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: -40 }}>
+                <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '0.08em', color: '#ffffff', textTransform: 'uppercase', marginBottom: -60 }}>
                   {p.title}
                 </div>
               </div>

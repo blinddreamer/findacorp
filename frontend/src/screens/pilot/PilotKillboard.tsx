@@ -21,7 +21,7 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
     return Array.from(counts.entries())
       .map(([ship, { kills, losses, typeId }]) => ({ ship, kills, losses, typeId, total: kills + losses }))
       .sort((a, b) => b.total - a.total)
-      .slice(0, 12);
+      .slice(0, 10);
   }, [p.killHistory]);
 
   useEffect(() => {
