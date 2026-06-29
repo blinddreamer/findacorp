@@ -7,6 +7,17 @@ import { fmtISK } from '../../utils/format';
 export default function PilotKillboard({ p }: { p: PilotProfile }) {
   const [resolvedTypeIds, setResolvedTypeIds] = useState<Record<string, number>>({});
 
+  // The backend heatmap holds raw kill counts per (day, hour); KillHeatmap expects
+  // discrete intensity levels 0–4. Scale each cell relative to the busiest cell so a
+  // single hot hour (e.g. a fleet's worth of kills in one hour) doesn't blank the grid.
+  const heatLevels = useMemo(() => {
+    const grid = p.heatmap;
+    if (!grid) return null;
+    const max = Math.max(0, ...grid.flat());
+    if (max === 0) return grid.map(row => row.map(() => 0));
+    return grid.map(row => row.map(c => (c <= 0 ? 0 : Math.min(4, Math.ceil((c / max) * 4)))));
+  }, [p.heatmap]);
+
   const topShips = useMemo(() => {
     if (!p.killHistory) return [];
     const counts = new Map<string, { kills: number; losses: number; typeId?: number }>();
@@ -57,10 +68,10 @@ export default function PilotKillboard({ p }: { p: PilotProfile }) {
           </div>
           {p.kbKills == null && <div className="muted" style={{ padding: '16px 0' }}>Kill data not yet synced.</div>}
         </div>
-        {p.heatmap && (
+        {heatLevels && (
           <div className="card">
             <div className="section-head" style={{ marginBottom: 16, width: '100%' }}><h3>Kill activity by hour</h3><span className="label">/ last 7 days</span></div>
-            <KillHeatmap grid={p.heatmap} />
+            <KillHeatmap grid={heatLevels} />
           </div>
         )}
       </div>

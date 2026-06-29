@@ -7,6 +7,7 @@ import TzRangeEditor from '../../components/TzRangeEditor';
 import RecentActivityCard from './RecentActivityCard';
 import { fmtSP, fmtISK } from '../../utils/format';
 import { inferTz, hoursRange } from '../../utils/tz';
+import { cleanEveBio } from '../../utils/eveText';
 import { ROLES, CONTENT_TYPES, LANGUAGES } from './constants';
 
 interface OverviewProps {
@@ -33,7 +34,8 @@ function eveBioNeedsClamp(bio: string): boolean {
 
 export default function PilotOverview({ p, isOwner, isEditing, draftTzHours, onTzChange, draftRoles, onRolesChange, draftContent, onContentChange, draftLanguages, onLanguagesChange }: OverviewProps) {
   const [eveBioExpanded, setEveBioExpanded] = useState(false);
-  const bioIsLong = !!p.eveBio && eveBioNeedsClamp(p.eveBio);
+  const eveBio = cleanEveBio(p.eveBio);
+  const bioIsLong = !!eveBio && eveBioNeedsClamp(eveBio);
   const hasManualHours = (p.manualTzActive?.length ?? 0) > 0;
 
   // Effective timezone label — mirrors the hero pill logic
@@ -114,7 +116,7 @@ export default function PilotOverview({ p, isOwner, isEditing, draftTzHours, onT
           </div>
         )}
 
-        {p.eveBio && (
+        {eveBio && (
           <div className="card">
             <div className="section-head">
               <h3>In-game bio</h3>
@@ -134,7 +136,7 @@ export default function PilotOverview({ p, isOwner, isEditing, draftTzHours, onT
                   WebkitLineClamp: EVE_BIO_CLAMP_LINES,
                 } : {}),
               }}>
-                {p.eveBio}
+                {eveBio}
               </p>
               {bioIsLong && (
                 <button
