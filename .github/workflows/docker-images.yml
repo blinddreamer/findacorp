@@ -16,6 +16,11 @@ name: Build & Push Docker Images
 #
 # Images are published as:  docker.io/<DOCKERHUB_USERNAME>/findacorp-<service>
 # Tagged with: `latest` (default branch only), the short commit SHA, and the git tag on v* tags.
+#
+# Runners:
+#   - change detection, jar build and image build/push run on GitHub-hosted `ubuntu-latest`.
+#   - the Portainer redeploy jobs run on a `self-hosted` runner, because the Portainer webhook
+#     is only reachable from inside the deployment network. That runner only needs `curl`.
 
 on:
   push:
@@ -181,24 +186,6 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
-      # Map the service name to its secret suffix: auth-service -> AUTH_SERVICE
-      - name: Resolve webhook secret name
-        id: hook
-        run: echo "name=$(echo '${{ matrix.service }}' | tr '[:lower:]' '[:upper:]' | tr '-' '_')" >> "$GITHUB_OUTPUT"
-
-      # Opt-in auto-redeploy: only fires when a PORTAINER_WEBHOOK_<SERVICE> secret exists.
-      - name: Trigger Portainer redeploy
-        env:
-          WEBHOOK: ${{ secrets[format('PORTAINER_WEBHOOK_{0}', steps.hook.outputs.name)] }}
-        run: |
-          if [ -z "$WEBHOOK" ]; then
-            echo "::notice::No PORTAINER_WEBHOOK_${{ steps.hook.outputs.name }} secret set — skipping auto-redeploy for ${{ matrix.service }}."
-            exit 0
-          fi
-          echo "Triggering Portainer redeploy for ${{ matrix.service }}…"
-          curl -fsS --retry 3 --retry-delay 5 -X POST "$WEBHOOK" -o /dev/null
-          echo "Redeploy webhook accepted."
-
   frontend:
     name: Image (frontend)
     needs: changes
@@ -235,8 +222,51 @@ jobs:
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
+  # ── Portainer redeploy ────────────────────────────────────────────────
+  # These run on a self-hosted runner because the Portainer webhook is only
+  # reachable from inside the deployment network. They build nothing — they
+  # just POST the webhook after the images are pushed to Docker Hub. The
+  # self-hosted runner only needs `curl`.
+
+  redeploy-services:
+    name: Redeploy (${{ matrix.service }})
+    needs: [changes, images]
+    if: needs.changes.outputs.services != '[]'
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.changes.outputs.services) }}
+    steps:
+      # Map the service name to its secret suffix: auth-service -> AUTH_SERVICE
+      - name: Resolve webhook secret name
+        id: hook
+        shell: bash
+        run: echo "name=$(echo '${{ matrix.service }}' | tr '[:lower:]' '[:upper:]' | tr '-' '_')" >> "$GITHUB_OUTPUT"
+
+      # Opt-in auto-redeploy: only fires when a PORTAINER_WEBHOOK_<SERVICE> secret exists.
+      - name: Trigger Portainer redeploy
+        shell: bash
+        env:
+          WEBHOOK: ${{ secrets[format('PORTAINER_WEBHOOK_{0}', steps.hook.outputs.name)] }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "::notice::No PORTAINER_WEBHOOK_${{ steps.hook.outputs.name }} secret set — skipping auto-redeploy for ${{ matrix.service }}."
+            exit 0
+          fi
+          echo "Triggering Portainer redeploy for ${{ matrix.service }}…"
+          curl -fsS --retry 3 --retry-delay 5 -X POST "$WEBHOOK" -o /dev/null
+          echo "Redeploy webhook accepted."
+
+  redeploy-frontend:
+    name: Redeploy (frontend)
+    needs: [changes, frontend]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: self-hosted
+    steps:
       # Opt-in auto-redeploy: only fires when the PORTAINER_WEBHOOK_FRONTEND secret exists.
       - name: Trigger Portainer redeploy
+        shell: bash
         env:
           WEBHOOK: ${{ secrets.PORTAINER_WEBHOOK_FRONTEND }}
         run: |

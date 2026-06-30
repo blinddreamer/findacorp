@@ -11,18 +11,24 @@ import com.findacorp.auth.repository.OauthStateRepository;
 import com.findacorp.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.UUID;
 
@@ -42,6 +48,13 @@ public class AuthService {
     private final com.findacorp.auth.feign.ProfileServiceClient profileService;
 
     private final RestClient ssoRestClient = RestClient.create();
+    private final RestClient esiRestClient = RestClient.create();
+
+    /** Scope required to send EVE in-game mail on a pilot's behalf. */
+    private static final String MAIL_SCOPE = "esi-mail.send_mail.v1";
+
+    @Value("${eve.esi.base-url:https://esi.evetech.net}")
+    private String esiBaseUrl;
 
     private String basicAuth() {
         String credentials = ssoProps.clientId() + ":" + ssoProps.clientSecret();
@@ -179,5 +192,63 @@ public class AuthService {
         }
 
         return encryption.decrypt(user.getAccessToken());
+    }
+
+    /**
+     * Send a real EVE in-game mail from {@code senderId} to {@code recipientId} via ESI,
+     * using the sender's EVE access token. Requires the sender to have granted the
+     * {@value #MAIL_SCOPE} scope (i.e. logged in after it was added).
+     */
+    public void sendEveMail(Long senderId, Long recipientId, String subject, String body) {
+        if (recipientId == null || subject == null || subject.isBlank() || body == null || body.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Recipient, subject and body are required");
+        }
+
+        User sender = userRepo.findById(senderId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unknown sender"));
+        if (sender.getScopes() == null || !sender.getScopes().contains(MAIL_SCOPE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "EVE mail permission not granted — log out and back in to enable sending EVE mails.");
+        }
+
+        String eveToken;
+        try {
+            eveToken = getFreshEveToken(senderId);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Your EVE session has expired — log out and back in to send mail.");
+        }
+
+        Map<String, Object> payload = Map.of(
+            "approved_cost", 0,
+            "subject", subject,
+            "body", body,
+            "recipients", List.of(Map.of("recipient_id", recipientId, "recipient_type", "character"))
+        );
+
+        try {
+            esiRestClient.post()
+                .uri(esiBaseUrl + "/latest/characters/{id}/mail/?datasource=tranquility", senderId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + eveToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(payload)
+                .retrieve()
+                .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            int status = e.getStatusCode().value();
+            log.warn("EVE mail send failed (sender={}, recipient={}, status={}): {}",
+                senderId, recipientId, status, e.getResponseBodyAsString());
+            // 520 = EVE wants an ISK (CSPA) charge approved to mail this character.
+            if (status == 520) {
+                throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED,
+                    "EVE requires an ISK payment (CSPA charge) to mail this pilot, so the mail was not sent.");
+            }
+            if (status == 403) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "EVE rejected the mail — log out and back in to grant mail permission.");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                "EVE mail service error (" + status + "). Please try again later.");
+        }
     }
 }

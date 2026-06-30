@@ -2,6 +2,7 @@ package com.findacorp.auth.controller;
 
 import com.findacorp.auth.dto.CharacterInfoResponse;
 import com.findacorp.auth.dto.RefreshRequest;
+import com.findacorp.auth.dto.SendMailRequest;
 import com.findacorp.auth.repository.UserRepository;
 import com.findacorp.auth.service.AuthService;
 import com.findacorp.auth.service.JwtService;
@@ -45,6 +46,15 @@ public class AuthController {
         Long charId = Long.parseLong(claims.getSubject());
         String name = claims.get("name", String.class);
         return ResponseEntity.ok(Map.of("accessToken", jwtService.issueAccess(charId, name)));
+    }
+
+    @PostMapping("/mail")
+    public ResponseEntity<Void> sendMail(@RequestHeader("Authorization") String bearerToken,
+                                         @RequestBody SendMailRequest req) {
+        Claims claims = jwtService.validateAndParse(bearerToken.replace("Bearer ", ""));
+        Long senderId = Long.parseLong(claims.getSubject());
+        authService.sendEveMail(senderId, req.recipientId(), req.subject(), req.body());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/account")

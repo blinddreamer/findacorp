@@ -1,5 +1,9 @@
 server:
   port: 8081
+  error:
+    # Surface ResponseStatusException reasons (e.g. EVE mail errors) in the JSON body
+    # so the frontend can show a useful message instead of a bare status code.
+    include-message: always
 
 spring:
   application:
@@ -28,7 +32,7 @@ eve:
     authorize-url: https://login.eveonline.com/v2/oauth/authorize
     token-url: https://login.eveonline.com/v2/oauth/token
     verify-url: https://login.eveonline.com/oauth/verify
-    scopes: "publicData esi-skills.read_skills.v1"
+    scopes: "publicData esi-skills.read_skills.v1 esi-mail.send_mail.v1"
     callback-url: ${CALLBACK_URL:http://localhost:3000/callback}
 
 jwt:

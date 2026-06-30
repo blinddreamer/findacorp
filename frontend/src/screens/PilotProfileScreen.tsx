@@ -33,7 +33,7 @@ export default function PilotProfileScreen() {
   const navigate = useNavigate();
   const stubAttempted = useRef(false);
   const [creatingStub, setCreatingStub] = useState(false);
-  const [contactModal, setContactModal] = useState(false);
+  const [contactMode, setContactMode] = useState<'message' | 'evemail' | null>(null);
   const [copied, setCopied] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -250,11 +250,11 @@ export default function PilotProfileScreen() {
         <div className="actions">
           {!isOwner && (
             <>
-              <Btn primary onClick={() => setContactModal(true)}>
+              <Btn primary onClick={() => setContactMode('message')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                 Message
               </Btn>
-              <Btn ghost onClick={() => setContactModal(true)}>
+              <Btn ghost onClick={() => setContactMode('evemail')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 8 L12 13 L21 8 V18 H3 Z" /><path d="M3 8 L12 3 L21 8" /></svg>
                 Send EVEmail
               </Btn>
@@ -296,15 +296,15 @@ export default function PilotProfileScreen() {
       {tab === 'killboard' && <PilotKillboard p={p} />}
       {tab === 'history' && <PilotHistory p={p} />}
 
-      {contactModal && (
+      {contactMode && (
         <ApplicationModal
           ctx={{
-            mode: 'contact-pilot',
+            mode: contactMode === 'evemail' ? 'evemail-pilot' : 'contact-pilot',
             targetId: p.characterId,
             targetName: p.name ?? `Pilot #${p.characterId}`,
             targetSp: p.sp,
           }}
-          onClose={() => setContactModal(false)}
+          onClose={() => setContactMode(null)}
         />
       )}
 

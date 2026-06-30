@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createApplication, createDirectMessage } from '../api/applicationApi';
+import { sendEveMail } from '../api/authApi';
 import Avatar from '../components/Avatar';
 import CorpLogo from '../components/CorpLogo';
 import Btn from '../components/Btn';
@@ -7,7 +8,7 @@ import Pill from '../components/Pill';
 import { fmtSP } from '../utils/format';
 
 export interface ApplicationCtx {
-  mode: 'apply-corp' | 'contact-pilot';
+  mode: 'apply-corp' | 'contact-pilot' | 'evemail-pilot';
   targetId: number;
   targetName: string;
   targetTicker?: string;
@@ -23,22 +24,27 @@ interface ApplicationModalProps {
 }
 
 export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps) {
+  const isPilotContact = ctx.mode === 'contact-pilot';
+  const isEvemail = ctx.mode === 'evemail-pilot';
+  const showPilotAvatar = isPilotContact || isEvemail;
+
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [subject, setSubject] = useState("FINDACORP — let's talk");
   const [message, setMessage] = useState(
-    ctx.mode === 'contact-pilot'
+    isPilotContact || isEvemail
       ? 'Saw your profile on FINDACORP. We\'re recruiting and your TZ and fit are a match. Open to a Mumble chat?\n\n— Recruiter'
       : 'EUTZ pilot looking for a good corp. References available. Fly safe — Pilot'
   );
-
-  const isPilotContact = ctx.mode === 'contact-pilot';
 
   async function handleSend() {
     setSending(true);
     setError(null);
     try {
-      if (isPilotContact) {
+      if (isEvemail) {
+        await sendEveMail({ recipientId: ctx.targetId, subject, body: message });
+      } else if (isPilotContact) {
         await createDirectMessage({ pilotId: ctx.targetId, message });
       } else {
         await createApplication({ corpId: ctx.targetId, message, direction: 'PILOT_TO_CORP' });
@@ -48,9 +54,11 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
       const ax = e as { response?: { status?: number; data?: { message?: string; error?: string } } };
       const status = ax?.response?.status;
       const backendMsg = ax?.response?.data?.message || ax?.response?.data?.error;
-      const fallback = isPilotContact
-        ? 'Could not send your message — please try again.'
-        : 'Could not send your application — please try again.';
+      const fallback = isEvemail
+        ? 'Could not send the EVE mail — please try again.'
+        : isPilotContact
+          ? 'Could not send your message — please try again.'
+          : 'Could not send your application — please try again.';
       if (backendMsg) {
         setError(`${backendMsg}${status ? ` (${status})` : ''}`);
       } else if (status === 404) {
@@ -70,25 +78,38 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
       <div className="modal" style={{ width: 600 }} onClick={e => e.stopPropagation()}>
         {step === 1 && (
           <>
-            <div className="eyebrow">// {isPilotContact ? 'contact pilot' : 'apply to corp'}</div>
+            <div className="eyebrow">// {isEvemail ? 'eve mail' : isPilotContact ? 'message pilot' : 'apply to corp'}</div>
             <h2 style={{ marginTop: 6, fontSize: 22 }}>
-              {isPilotContact ? `EVEmail ${ctx.targetName}` : `Apply to ${ctx.targetName}`}
+              {isEvemail ? `EVE mail to ${ctx.targetName}` : isPilotContact ? `Message ${ctx.targetName}` : `Apply to ${ctx.targetName}`}
             </h2>
 
             <div style={{ display: 'flex', gap: 12, padding: 12, marginTop: 16, background: 'var(--bg-base)', borderRadius: 6, border: '1px solid var(--border-soft)' }}>
-              {isPilotContact
+              {showPilotAvatar
                 ? <Avatar characterId={ctx.targetId} seed={ctx.targetName} size={44} />
                 : <CorpLogo corpId={ctx.targetId} seed={ctx.targetName} size={44} faction={ctx.targetFaction} />}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 500 }}>{ctx.targetName}</div>
                 <div className="muted mono" style={{ fontSize: 11, marginTop: 2 }}>
-                  {isPilotContact
+                  {showPilotAvatar
                     ? `${ctx.targetTicker ?? ''} · ${ctx.targetSp != null ? fmtSP(ctx.targetSp) + ' SP' : ''}`
                     : `${ctx.targetTicker ?? ''} · ${ctx.targetAlliance ?? 'no alliance'}`}
                 </div>
               </div>
-              <Pill kind="good"><span className="dot" />{isPilotContact ? 'looking' : (ctx.targetStatus ?? 'open')}</Pill>
+              <Pill kind="good"><span className="dot" />{isEvemail ? 'in-game' : isPilotContact ? 'looking' : (ctx.targetStatus ?? 'open')}</Pill>
             </div>
+
+            {isEvemail && (
+              <div style={{ marginTop: 18 }}>
+                <div className="stat-label" style={{ marginBottom: 8 }}>Subject</div>
+                <input
+                  className="input"
+                  style={{ width: '100%' }}
+                  value={subject}
+                  maxLength={1000}
+                  onChange={e => setSubject(e.target.value)}
+                />
+              </div>
+            )}
 
             <div style={{ marginTop: 18 }}>
               <div className="stat-label" style={{ marginBottom: 8 }}>Message</div>
@@ -98,7 +119,9 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
                 value={message}
                 onChange={e => setMessage(e.target.value)}
               />
-              <div className="muted mono" style={{ fontSize: 11, marginTop: 6 }}>{message.length} chars · sent as FINDACORP inbox message</div>
+              <div className="muted mono" style={{ fontSize: 11, marginTop: 6 }}>
+                {message.length} chars · {isEvemail ? 'sent as a real EVE in-game mail' : 'sent as FINDACORP inbox message'}
+              </div>
             </div>
 
             {error && (
@@ -109,7 +132,7 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 22 }}>
               <Btn ghost onClick={onClose}>Cancel</Btn>
-              <Btn primary onClick={handleSend} disabled={sending}>
+              <Btn primary onClick={handleSend} disabled={sending || (isEvemail && !subject.trim())}>
                 {sending ? 'Sending…' : 'Send →'}
               </Btn>
             </div>
@@ -123,9 +146,11 @@ export default function ApplicationModal({ ctx, onClose }: ApplicationModalProps
             </div>
             <h2 style={{ fontSize: 22 }}>Sent. Fly safe.</h2>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 10, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
-              {isPilotContact
-                ? `${ctx.targetName} will see your message in their FINDACORP inbox. Most pilots reply within 24h.`
-                : `Your application is now in the recruiter queue. They typically reply within 12h.`}
+              {isEvemail
+                ? `${ctx.targetName} will get your mail in their EVE inbox the next time they log in.`
+                : isPilotContact
+                  ? `${ctx.targetName} will see your message in their FINDACORP inbox. Most pilots reply within 24h.`
+                  : `Your application is now in the recruiter queue. They typically reply within 12h.`}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 22 }}>
               <Btn onClick={onClose}>Close</Btn>
