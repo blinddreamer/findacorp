@@ -39,6 +39,48 @@ export function clearAccessToken() {
   setAccessToken(null);
 }
 
+/** Expiry (epoch seconds) of the current access token, or null if none/unknown. */
+export function getAccessTokenExp(): number | null {
+  if (!_token) return null;
+  const exp = decodeJwtPayload(_token)?.exp;
+  return typeof exp === 'number' ? exp : null;
+}
+
+// Exchange the stored refresh token for a fresh access token. Concurrent calls share
+// one in-flight request. Uses fetch (not apiClient) to avoid an interceptor cycle and
+// to send the refresh token in the body rather than the (possibly expired) bearer.
+let _refreshInFlight: Promise<boolean> | null = null;
+
+export function refreshAccessToken(): Promise<boolean> {
+  if (_refreshInFlight) return _refreshInFlight;
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) return Promise.resolve(false);
+
+  _refreshInFlight = fetch('/api/auth/refresh', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        // Refresh token rejected (expired/invalid) — the session is over.
+        clearAccessToken();
+        return false;
+      }
+      const data = await res.json();
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken);
+        return true;
+      }
+      clearAccessToken();
+      return false;
+    })
+    .catch(() => false) // transient network error — keep the session, retry later
+    .finally(() => { _refreshInFlight = null; });
+
+  return _refreshInFlight;
+}
+
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split('.');

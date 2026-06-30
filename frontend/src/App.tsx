@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import BrandMark from './components/BrandMark';
 import Btn from './components/Btn';
+import SessionGuard from './components/SessionGuard';
 import { useAuth, clearAccessToken } from './auth/useAuth';
 import { useRecruiterStatus } from './auth/useIsRecruiter';
 import { logout } from './api/authApi';
@@ -29,6 +30,7 @@ export default function App() {
 
   return (
     <div className="shell">
+      <SessionGuard />
       <TopNav auth={auth} />
       <main>
         <Routes>
