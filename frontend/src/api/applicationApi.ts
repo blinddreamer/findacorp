@@ -7,7 +7,7 @@ export interface ApplicationRequest {
 }
 
 export type ThreadType = 'APPLICATION' | 'DIRECT' | 'SYSTEM';
-export type ThreadStatus = 'SENT' | 'READ' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+export type ThreadStatus = 'SENT' | 'READ' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
 
 export interface ThreadResponse {
   id: number;
@@ -71,7 +71,7 @@ export async function sendThreadMessage(threadId: number, body: string): Promise
 
 export async function updateThreadStatus(
   threadId: number,
-  status: 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'READ'
+  status: 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'READ' | 'UNDER_REVIEW'
 ): Promise<ThreadResponse> {
   const { data } = await apiClient.put(`/inbox/${threadId}/status`, { status });
   return data;

@@ -16,11 +16,16 @@ import CorpListingScreen from './screens/CorpListingScreen';
 import SearchPilotsScreen from './screens/SearchPilotsScreen';
 import SearchCorpsScreen from './screens/SearchCorpsScreen';
 import InboxScreen from './screens/InboxScreen';
+import ApplicationsScreen from './screens/ApplicationsScreen';
+import { useInboxStream } from './hooks/useInboxStream';
 
 const FACTION = 'caldari';
 
 export default function App() {
   const auth = useAuth();
+
+  // Live inbox updates (new messages, status changes) push over SSE while logged in.
+  useInboxStream(auth.token);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-faction', FACTION);
@@ -40,6 +45,7 @@ export default function App() {
           <Route path="/search/pilots" element={<SearchPilotsScreen />} />
           <Route path="/search/corps" element={<SearchCorpsScreen />} />
           <Route path="/inbox" element={<InboxScreen />} />
+          <Route path="/applications" element={<ApplicationsScreen />} />
           <Route path="/callback" element={<AuthCallback />} />
         </Routes>
       </main>
@@ -88,7 +94,8 @@ function TopNav({ auth }: { auth: NavAuth }) {
       '/': 'FINDACORP',
       '/search/corps': 'Find a Corp · FINDACORP',
       '/search/pilots': 'Find Pilots · FINDACORP',
-      '/inbox': 'Inbox · FINDACORP',
+      '/inbox': 'Messages · FINDACORP',
+      '/applications': 'Applications · FINDACORP',
     };
     const title = staticTitles[currentPath];
     if (title) {
@@ -108,6 +115,8 @@ function TopNav({ auth }: { auth: NavAuth }) {
     ...(auth.characterId ? [{ path: '/search/corps', label: 'Find a corp' }] : []),
     // HR tool — only a corp's CEO or appointed HR sees it.
     ...(isRecruiter ? [{ path: '/search/pilots', label: 'HR · find pilots' }] : []),
+    // Applications: pilots track theirs; recruiters also review incoming ones here.
+    ...(auth.characterId ? [{ path: '/applications', label: 'Applications' }] : []),
     ...(auth.characterId ? [{ path: `/pilots/${auth.characterId}`, label: 'My profile' }] : []),
     // Shortcut to the user's corp listing, once it has been published.
     ...(corpId && hasListing ? [{ path: `/corps/${corpId}`, label: 'My corp' }] : []),
@@ -166,7 +175,7 @@ function InboxButton({ navigate, currentPath }: { navigate: (p: string) => void;
 
   return (
     <Btn sm ghost onClick={() => navigate('/inbox')} style={currentPath === '/inbox' ? { borderColor: 'var(--accent)' } : undefined}>
-      Inbox
+      Messages
       {count > 0 && (
         <span className="mono" style={{ color: 'var(--accent-text)', marginLeft: 5 }}>{count}</span>
       )}

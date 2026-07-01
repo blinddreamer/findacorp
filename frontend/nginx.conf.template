@@ -13,6 +13,24 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # Inbox Server-Sent Events stream. Must be a distinct (longer-prefix) location so
+    # buffering is disabled — otherwise nginx buffers the response and events never
+    # reach the browser until the connection closes. Long read timeout keeps the
+    # long-lived stream open; the client also reconnects on drop.
+    location /api/inbox/stream {
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass ${GATEWAY_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection '';
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+    }
+
     # Proxy API calls to the FINDACORP api-gateway. Everything the SPA calls is under
     # /api/* (see axiosClient baseURL); we strip that prefix so the gateway keeps its
     # existing /auth, /profiles, /search, /inbox routes. Mirrors the Vite dev proxy.

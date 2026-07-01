@@ -12,10 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.findacorp.application.dto.InboxEvent;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +32,7 @@ public class InboxService {
     private final ThreadParticipantRepository participantRepo;
     private final ThreadMessageRepository messageRepo;
     private final ProfileServiceClient profileClient;
+    private final InboxStreamService streamService;
 
     // ── Pilot → corp application ──────────────────────────────────────────────
 
@@ -229,6 +233,7 @@ public class InboxService {
         validateStatusTransition(me.getSide(), req.status());
         thread.setStatus(req.status());
         threadRepo.save(thread);
+        notifyParticipants(thread.getId(), InboxEvent.status(thread.getId()));
         return toThreadResponse(thread, callerId);
     }
 
@@ -243,7 +248,28 @@ public class InboxService {
         // Bump the thread so it sorts to the top of inboxes
         thread.setUpdatedAt(LocalDateTime.now());
         threadRepo.save(thread);
+        notifyParticipants(thread.getId(), InboxEvent.message(thread.getId()));
         return msg;
+    }
+
+    /**
+     * Push an inbox event to every participant's live stream, after the current
+     * transaction commits — so a client that reacts by refetching sees the write.
+     * Falls back to an immediate publish when there is no active transaction.
+     */
+    private void notifyParticipants(Long threadId, InboxEvent event) {
+        List<Long> ids = participantRepo.findByThreadId(threadId).stream()
+                .map(ThreadParticipant::getCharacterId)
+                .distinct()
+                .toList();
+        if (ids.isEmpty()) return;
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override public void afterCommit() { streamService.publish(ids, event); }
+            });
+        } else {
+            streamService.publish(ids, event);
+        }
     }
 
     private void addCorpParticipants(Long threadId, CorpSummary corp) {
@@ -299,9 +325,9 @@ public class InboxService {
                 if (side != ParticipantSide.PILOT) throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "Only the pilot can withdraw an application");
             }
-            case ACCEPTED, REJECTED, READ -> {
+            case ACCEPTED, REJECTED, READ, UNDER_REVIEW -> {
                 if (side != ParticipantSide.CORP) throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Only the corp can accept, reject, or mark as read");
+                        HttpStatus.FORBIDDEN, "Only the corp can review, approve, reject, or mark as read");
             }
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Invalid status transition to " + newStatus);
