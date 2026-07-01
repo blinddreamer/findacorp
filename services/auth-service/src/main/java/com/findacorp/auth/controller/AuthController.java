@@ -24,6 +24,12 @@ public class AuthController {
 
     @GetMapping("/login")
     public void login(jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        // The authorize URL carries a single-use `state` + PKCE challenge, so this redirect
+        // must never be cached by the browser or any proxy — otherwise a stale authorize URL
+        // gets replayed (causing invalid_scope after scope changes, or expired-state failures).
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
         response.sendRedirect(authService.buildLoginRedirectUrl());
     }
 

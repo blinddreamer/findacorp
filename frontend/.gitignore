@@ -25,7 +25,6 @@ dist-ssr
 
 # Claude
 .claude/
-CLAUDE.md
 .claudeignore
 claude.json
 docs/

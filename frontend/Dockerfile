@@ -1,8 +1,14 @@
 # ── Stage 1: build the Vite SPA ───────────────────────────────────────────────
 FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+# `package*.json` matches package.json always and package-lock.json only if it
+# exists — so the build works whether or not a lockfile is committed.
+COPY package*.json ./
+# Not `npm ci`: a committed lockfile is generated on Windows and omits the
+# Linux/musl WASM optional deps (e.g. @emnapi/runtime) this Alpine image needs,
+# so `npm ci` fails its strict in-sync check. `npm install` resolves correctly
+# for this platform, using the lockfile as a base when present.
+RUN npm install --no-audit --no-fund
 COPY . .
 RUN npm run build
 

@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import type { CorpProfile } from '../../types/corp';
 import TZRing from '../../components/TZRing';
 import Pill from '../../components/Pill';
 import Stat from '../../components/Stat';
 import TzRangeEditor from '../../components/TzRangeEditor';
 import { inferTz, hoursRange } from '../../utils/tz';
-import { toggleId, resolveMemberName, hrCandidates, orphanedHrIds, MAX_HR } from '../../utils/hr';
+import { toggleId, resolveMemberName, hrCandidates, MAX_HR } from '../../utils/hr';
 import { parseRequirement, formatRequirement, splitRequirement } from '../../utils/requirements';
 
 const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
+// How many HR candidates the searchable picker renders per page (raised by "Show more").
+const HR_PAGE = 50;
 
 interface OverviewProps {
   c: CorpProfile;
@@ -84,12 +87,20 @@ export default function CorpOverview({
   }
 
   // ── HR management (CEO only) ──────────────────────────────────────────────
+  const [hrSearch, setHrSearch] = useState('');
+  const [hrVisible, setHrVisible] = useState(HR_PAGE);
   const roster = c.roster ?? [];
   const currentHrIds = isEditing ? draftHrIds : (c.hrIds ?? []);
   const candidates = hrCandidates(roster, c.ceoId);
-  const orphanedHr = orphanedHrIds(draftHrIds, roster, c.ceoId);
   // The CEO always manages HR; HR/members see the appointed list read-only.
   const showHrCard = isCeo || (isEditable && currentHrIds.length > 0);
+  // Searchable candidate picker: only members not already appointed, filtered by
+  // the search box and capped so a thousand-member roster never renders at once.
+  const hrQuery = hrSearch.trim().toLowerCase();
+  const hrMatches = candidates
+    .filter(m => !draftHrIds.includes(m.characterId))
+    .filter(m => !hrQuery || m.characterName.toLowerCase().includes(hrQuery));
+  const atHrCap = draftHrIds.length >= MAX_HR;
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 20 }}>
@@ -286,32 +297,68 @@ export default function CorpOverview({
                   Appoint up to {MAX_HR} corp members who may edit this listing and trigger syncs. As CEO you always have access.
                   {' '}<span style={{ color: 'var(--text-mid)' }}>({draftHrIds.length}/{MAX_HR} appointed)</span>
                 </div>
-                {candidates.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto' }}>
-                    {candidates.map(m => {
-                      const checked = draftHrIds.includes(m.characterId);
-                      const atCap = !checked && draftHrIds.length >= MAX_HR;
-                      return (
-                        <label key={m.characterId} className="checkbox-row" style={{ cursor: atCap ? 'not-allowed' : 'pointer', opacity: atCap ? 0.5 : 1 }}>
-                          <input type="checkbox" checked={checked} disabled={atCap} onChange={() => toggleHr(m.characterId)} />
-                          <span>{m.characterName}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="muted" style={{ fontSize: 13 }}>No corp members synced yet — run a sync to populate the roster.</div>
-                )}
-                {orphanedHr.length > 0 && (
-                  <div style={{ marginTop: 12, borderTop: '1px solid var(--border-soft)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div className="stat-label" style={{ marginBottom: 2 }}>No longer in corp</div>
-                    {orphanedHr.map(id => (
-                      <label key={id} className="checkbox-row" style={{ cursor: 'pointer' }}>
-                        <input type="checkbox" checked onChange={() => toggleHr(id)} />
-                        <span>{resolveMemberName(roster, id)}</span>
-                      </label>
+
+                {/* Appointed HR — removable chips (includes any who have since left the corp) */}
+                {draftHrIds.length > 0 && (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: candidates.length > 0 ? 14 : 0 }}>
+                    {draftHrIds.map(id => (
+                      <span key={id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 4px 4px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)', borderRadius: 4, fontSize: 13, color: 'var(--accent-text)' }}>
+                        {resolveMemberName(roster, id)}
+                        <button type="button" onClick={() => toggleHr(id)} title="Remove HR" style={{ background: 'none', border: 'none', color: 'var(--text-mute)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
+                      </span>
                     ))}
                   </div>
+                )}
+
+                {candidates.length === 0 ? (
+                  <div className="muted" style={{ fontSize: 13 }}>No corp members synced yet — run a sync to populate the roster.</div>
+                ) : atHrCap ? (
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    Maximum of {MAX_HR} HR appointed — remove one above to appoint someone else.
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      className="input"
+                      placeholder="Search members to appoint…"
+                      value={hrSearch}
+                      onChange={e => { setHrSearch(e.target.value); setHrVisible(HR_PAGE); }}
+                      style={{ marginBottom: 8, fontSize: 13 }}
+                    />
+                    {hrMatches.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 260, overflowY: 'auto' }}>
+                        {hrMatches.slice(0, hrVisible).map(m => (
+                          <div key={m.characterId} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid var(--border-soft)' }}>
+                            <img
+                              src={`https://images.evetech.net/characters/${m.characterId}/portrait?size=32`}
+                              alt={m.characterName}
+                              style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, background: 'var(--bg-elev)' }}
+                              onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                            <span style={{ fontSize: 13, flex: 1, minWidth: 0 }}>{m.characterName}</span>
+                            <button
+                              type="button"
+                              onClick={() => toggleHr(m.characterId)}
+                              style={{ flexShrink: 0, background: 'none', border: '1px solid var(--border)', borderRadius: 4, color: 'var(--accent-text)', cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}
+                            >
+                              + Add
+                            </button>
+                          </div>
+                        ))}
+                        {hrMatches.length > hrVisible && (
+                          <button
+                            type="button"
+                            onClick={() => setHrVisible(v => v + HR_PAGE)}
+                            style={{ alignSelf: 'flex-start', background: 'none', border: '1px dashed var(--border)', borderRadius: 4, color: 'var(--text-mid)', cursor: 'pointer', fontSize: 12, padding: '6px 10px', marginTop: 6 }}
+                          >
+                            Show {Math.min(HR_PAGE, hrMatches.length - hrVisible)} more ({hrMatches.length - hrVisible} remaining)
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="muted" style={{ fontSize: 13, padding: '8px 0' }}>No members match "{hrSearch}".</div>
+                    )}
+                  </>
                 )}
               </>
             ) : currentHrIds.length > 0 ? (
