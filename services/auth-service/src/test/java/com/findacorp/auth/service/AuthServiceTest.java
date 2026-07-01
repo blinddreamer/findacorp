@@ -7,12 +7,14 @@ import com.findacorp.auth.feign.EveVerifyClient;
 import com.findacorp.auth.feign.ProfileServiceClient;
 import com.findacorp.auth.repository.OauthStateRepository;
 import com.findacorp.auth.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -34,6 +36,13 @@ class AuthServiceTest {
     @Mock DataCollectorClient dataCollector;
     @Mock ProfileServiceClient profileService;
     @InjectMocks AuthService authService;
+
+    @BeforeEach
+    void enableEveMailByDefault() {
+        // @InjectMocks leaves the @Value primitive boolean as false; enable it so the
+        // existing tests exercise the mail flow rather than the disabled short-circuit.
+        ReflectionTestUtils.setField(authService, "eveMailEnabled", true);
+    }
 
     private User userWithScopes(long id, String scopes) {
         User u = new User();
@@ -59,6 +68,14 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.sendEveMail(1L, 2L, "Hi", "Body"))
             .isInstanceOf(ResponseStatusException.class)
             .satisfies(e -> assertStatus((ResponseStatusException) e, HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    void sendEveMail_featureDisabled_503() {
+        ReflectionTestUtils.setField(authService, "eveMailEnabled", false);
+        assertThatThrownBy(() -> authService.sendEveMail(1L, 2L, "Hi", "Body"))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(e -> assertStatus((ResponseStatusException) e, HttpStatus.SERVICE_UNAVAILABLE));
     }
 
     @Test

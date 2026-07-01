@@ -35,6 +35,11 @@ eve:
     scopes: ${EVE_SCOPES:publicData esi-skills.read_skills.v1}
     callback-url: ${CALLBACK_URL:http://localhost:3000/callback}
 
+app:
+  # Feature flag: set EVE_MAIL_ENABLED=false to disable sending EVE in-game mail
+  # platform-wide. Keep in sync with the frontend's EVE_MAIL_ENABLED.
+  eve-mail-enabled: ${EVE_MAIL_ENABLED:true}
+
 jwt:
   secret: ${JWT_SECRET}
   access-expiry-minutes: 60

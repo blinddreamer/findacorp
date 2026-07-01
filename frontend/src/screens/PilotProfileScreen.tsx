@@ -17,6 +17,7 @@ import VisibilityToggle from '../components/VisibilityToggle';
 import { fmtSP } from '../utils/format';
 import { inferTz } from '../utils/tz';
 import { cleanEveBio } from '../utils/eveText';
+import { EVE_MAIL_ENABLED } from '../config';
 
 /** A profile fetch fails with 403/404 when it's private (or absent) — bounce non-owners home. */
 function isHiddenError(error: unknown): boolean {
@@ -254,10 +255,12 @@ export default function PilotProfileScreen() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                 Message
               </Btn>
-              <Btn ghost onClick={() => setContactMode('evemail')}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 8 L12 13 L21 8 V18 H3 Z" /><path d="M3 8 L12 3 L21 8" /></svg>
-                Send EVEmail
-              </Btn>
+              {EVE_MAIL_ENABLED && (
+                <Btn ghost onClick={() => setContactMode('evemail')}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 8 L12 13 L21 8 V18 H3 Z" /><path d="M3 8 L12 3 L21 8" /></svg>
+                  Send EVEmail
+                </Btn>
+              )}
             </>
           )}
           <Btn ghost onClick={() => window.open(`https://zkillboard.com/character/${p.characterId}/`, '_blank')}>⌃ Open in zKill</Btn>

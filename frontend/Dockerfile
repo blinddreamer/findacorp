@@ -16,6 +16,11 @@ RUN npm run build
 FROM nginx:1.27-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+# Runtime SPA config: substitutes container env vars into env.js at startup (see the
+# script). `sed` strips any CR from a Windows checkout so /bin/sh can run it.
+COPY docker-entrypoint.d/30-envsubst-env-js.sh /docker-entrypoint.d/30-envsubst-env-js.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.d/30-envsubst-env-js.sh \
+    && chmod +x /docker-entrypoint.d/30-envsubst-env-js.sh
 # Where the api-gateway is reachable from this container; override at deploy time.
 ENV GATEWAY_URL=http://api-gateway:8080
 EXPOSE 80

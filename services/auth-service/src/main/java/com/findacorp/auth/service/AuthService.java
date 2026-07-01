@@ -56,6 +56,10 @@ public class AuthService {
     @Value("${eve.esi.base-url:https://esi.evetech.net}")
     private String esiBaseUrl;
 
+    /** Feature flag: when false, sending EVE mail is disabled platform-wide. Mirrors the UI's EVE_MAIL_ENABLED. */
+    @Value("${app.eve-mail-enabled:true}")
+    private boolean eveMailEnabled;
+
     private String basicAuth() {
         String credentials = ssoProps.clientId() + ":" + ssoProps.clientSecret();
         return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
@@ -200,6 +204,9 @@ public class AuthService {
      * {@value #MAIL_SCOPE} scope (i.e. logged in after it was added).
      */
     public void sendEveMail(Long senderId, Long recipientId, String subject, String body) {
+        if (!eveMailEnabled) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "EVE mail sending is currently disabled.");
+        }
         if (recipientId == null || subject == null || subject.isBlank() || body == null || body.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Recipient, subject and body are required");
         }
