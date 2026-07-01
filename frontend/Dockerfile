@@ -2,7 +2,11 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# Not `npm ci`: the lockfile is generated on Windows and omits the Linux/musl
+# WASM optional deps (e.g. @emnapi/runtime) this Alpine image needs, so `npm ci`
+# fails its strict in-sync check. `npm install` reconciles the missing platform
+# deps at build time from the same lockfile.
+RUN npm install --no-audit --no-fund
 COPY . .
 RUN npm run build
 
