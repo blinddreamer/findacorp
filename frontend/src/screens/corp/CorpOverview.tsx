@@ -11,6 +11,8 @@ import { parseRequirement, formatRequirement, splitRequirement } from '../../uti
 const CORP_ACTIVITIES = ['Null', 'Small gang', 'Black ops', 'Wormhole', 'Lowsec', 'Industry', 'Capital', 'Mining', 'Exploration', 'FW', 'FW Small Gang'];
 const CORP_ROLES_WANTED = ['Logi', 'DPS', 'Capital'];
 const LANGUAGES = ['English', 'German', 'French', 'Russian', 'Japanese', 'Korean', 'Chinese', 'Spanish', 'Portuguese'];
+// How many HR candidates the searchable picker renders per page (raised by "Show more").
+const HR_PAGE = 50;
 
 interface OverviewProps {
   c: CorpProfile;
@@ -86,6 +88,7 @@ export default function CorpOverview({
 
   // ── HR management (CEO only) ──────────────────────────────────────────────
   const [hrSearch, setHrSearch] = useState('');
+  const [hrVisible, setHrVisible] = useState(HR_PAGE);
   const roster = c.roster ?? [];
   const currentHrIds = isEditing ? draftHrIds : (c.hrIds ?? []);
   const candidates = hrCandidates(roster, c.ceoId);
@@ -97,7 +100,6 @@ export default function CorpOverview({
   const hrMatches = candidates
     .filter(m => !draftHrIds.includes(m.characterId))
     .filter(m => !hrQuery || m.characterName.toLowerCase().includes(hrQuery));
-  const HR_RESULT_LIMIT = 50;
   const atHrCap = draftHrIds.length >= MAX_HR;
 
   return (
@@ -320,12 +322,12 @@ export default function CorpOverview({
                       className="input"
                       placeholder="Search members to appoint…"
                       value={hrSearch}
-                      onChange={e => setHrSearch(e.target.value)}
+                      onChange={e => { setHrSearch(e.target.value); setHrVisible(HR_PAGE); }}
                       style={{ marginBottom: 8, fontSize: 13 }}
                     />
                     {hrMatches.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 260, overflowY: 'auto' }}>
-                        {hrMatches.slice(0, HR_RESULT_LIMIT).map(m => (
+                        {hrMatches.slice(0, hrVisible).map(m => (
                           <div key={m.characterId} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid var(--border-soft)' }}>
                             <img
                               src={`https://images.evetech.net/characters/${m.characterId}/portrait?size=32`}
@@ -343,10 +345,14 @@ export default function CorpOverview({
                             </button>
                           </div>
                         ))}
-                        {hrMatches.length > HR_RESULT_LIMIT && (
-                          <div className="muted" style={{ fontSize: 12, padding: '8px 0' }}>
-                            +{hrMatches.length - HR_RESULT_LIMIT} more — refine your search to narrow the list.
-                          </div>
+                        {hrMatches.length > hrVisible && (
+                          <button
+                            type="button"
+                            onClick={() => setHrVisible(v => v + HR_PAGE)}
+                            style={{ alignSelf: 'flex-start', background: 'none', border: '1px dashed var(--border)', borderRadius: 4, color: 'var(--text-mid)', cursor: 'pointer', fontSize: 12, padding: '6px 10px', marginTop: 6 }}
+                          >
+                            Show {Math.min(HR_PAGE, hrMatches.length - hrVisible)} more ({hrMatches.length - hrVisible} remaining)
+                          </button>
                         )}
                       </div>
                     ) : (
