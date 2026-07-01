@@ -113,7 +113,7 @@ export default function LandingScreen() {
         <FeatureCard
           tag="// FOR CORP HR"
           title="Search by timezone overlap, not SP number."
-          body="Filter the pilot pool by your prime-time hours. See who actually logs in. Stop signing recruits who ghost after the first ping."
+          body="Filter the pilot pool by your prime-time hours. See who's actually putting up kills, not who claims to log in daily. Stop signing recruits who ghost after the first ping."
           example={<MiniSearch />}
         />
         <FeatureCard
@@ -136,12 +136,12 @@ export default function LandingScreen() {
           <Differentiator
             glyph="02"
             title="Built for EVE we actually play"
-            body="Blops, wormhole rolling, FW, cap escalations — if your corp does it, we have a tag. No lazy 'PvE / PvP / Both' buckets."
+            body="Black ops, wormhole, FW, capital — real content tags, not a vague 'PvP' checkbox. Pick what your corp actually flies."
           />
           <Differentiator
             glyph="03"
-            title="No ghost accounts"
-            body="Every pilot is ESI-verified. No fake alts, no padded SP. What you see is what they actually fly."
+            title="No padded SP"
+            body="Every pilot is ESI-verified — SP and skills come straight from the API, not self-reported. We can't stop someone from posting a fresh alt, but we can stop them from lying about what's on it."
           />
         </div>
       </div>
@@ -240,7 +240,6 @@ function MiniSearch() {
         ['tz', 'EU prime'],
         ['sp', '25M+'],
         ['content', 'blops, small gang'],
-        ['activity', 'daily'],
       ].map(([k, v]) => (
         <div key={k} style={{ display: 'flex', justifyContent: 'space-between', paddingBlock: '5px', borderBottom: '1px solid var(--border-soft)' }}>
           <span style={{ color: 'var(--text-dim)' }}>{k}</span>
@@ -279,12 +278,14 @@ function MiniPilotCard() {
     <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border-soft)', borderRadius: 'var(--radius)', padding: '14px 16px' }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-dim)', marginBottom: 10, letterSpacing: '0.08em' }}>// your profile</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 'var(--radius)', background: 'var(--bg-elev)', border: '1px solid var(--border-soft)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--accent-soft)', border: '1px solid var(--accent-line)' }} />
-        </div>
+        <img
+          src="https://images.evetech.net/characters/93774683/portrait?size=64"
+          alt="John Doe"
+          style={{ width: 44, height: 44, borderRadius: 'var(--radius)', border: '1px solid var(--border-soft)', flexShrink: 0, objectFit: 'cover', display: 'block' }}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 500, fontSize: 14 }}>YourCharacterName</div>
-          <div style={{ fontSize: 12, color: 'var(--text-mute)', marginTop: 2 }}>42.3M SP · EU prime · Daily</div>
+          <div style={{ fontWeight: 500, fontSize: 14 }}>John Doe</div>
+          <div style={{ fontSize: 12, color: 'var(--text-mute)', marginTop: 2 }}>42.3M SP · EU prime</div>
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--good)', flexShrink: 0 }}>87% eff</div>
       </div>
@@ -302,12 +303,14 @@ function MiniCorpCard() {
     <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border-soft)', borderRadius: 'var(--radius)', padding: '14px 16px' }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-dim)', marginBottom: 10, letterSpacing: '0.08em' }}>// your listing</div>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 'var(--radius)', background: 'var(--bg-elev)', border: '1px solid var(--border-soft)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 22, height: 16, borderRadius: 2, background: 'var(--accent-soft)', border: '1px solid var(--accent-line)' }} />
-        </div>
+        <img
+          src="https://images.evetech.net/corporations/633462446/logo?size=64"
+          alt="MagicSandCastle"
+          style={{ width: 44, height: 44, borderRadius: 'var(--radius)', border: '1px solid var(--border-soft)', flexShrink: 0, objectFit: 'cover', display: 'block' }}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-text)' }}>CORP</div>
-          <div style={{ fontWeight: 500, fontSize: 15, marginTop: 2 }}>Your Corporation</div>
+          <div style={{ fontWeight: 500, fontSize: 15, marginTop: 2 }}>MagicSandCastle</div>
           <div style={{ fontSize: 12, color: 'var(--text-mute)', marginTop: 2 }}>EU · 25M SP min · Logi wanted</div>
         </div>
         <span className="pill good" style={{ fontSize: 11, flexShrink: 0 }}><span className="dot" />open</span>
